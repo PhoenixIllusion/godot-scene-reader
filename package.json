@@ -1,0 +1,22 @@
+{
+  "name": "godot-scene-reader",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "parser": "peggy -o ./src/godot-scene-reader/parse/text/resource/parser.js --format es ./src/godot-scene-reader/parse/text/resource/parser.peggy"
+  },
+  "devDependencies": {
+    "@types/pako": "2.0.3",
+    "peggy": "4.0.3",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.1"
+  },
+  "dependencies": {
+    "fzstd": "0.1.1",
+    "pako": "2.1.0"
+  }
+}
