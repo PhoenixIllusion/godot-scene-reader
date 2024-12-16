@@ -4,7 +4,7 @@ import * as fzstd from 'fzstd';
 
 const MAGIC = 'RSCC';
 
-enum CompressionMode {
+const enum CompressionMode {
   MODE_FASTLZ,
   MODE_DEFLATE,
   MODE_ZSTD,

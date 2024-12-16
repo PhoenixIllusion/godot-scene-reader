@@ -1,19 +1,18 @@
 import { DataReader, decoder } from "../../util/data-reader";
 import { TokenType } from "./gdc_tokens";
 import { decode_variant, unmarshaller_type_as_string } from "./unmarshaller";
-import { getKeyByValue } from "./util/enum";
 import { GodotReader } from "./util/reader";
 
 import * as fzstd from 'fzstd';
 
-enum TOKEN {
+const enum TOKEN {
   TOKEN_BYTE_MASK = 0x80,
   TOKEN_BITS = 8,
   TOKEN_MASK = (1 << (TOKEN_BITS - 1)) - 1,
 }
 
-export interface Token {type: string, start_line: number, literal?: any}
-export interface Constant { type: number, type_s: string, val: any};
+export interface Token {type: TokenType, start_line: number, literal?: string|Constant}
+export interface Constant { type: number, type_s: string, val: ReturnType<typeof decode_variant>};
 
 function _binary_to_token(arrayBuffer: ArrayBuffer, identifiers: string[], constants: any[] ) {
   let f = new DataView(arrayBuffer);
@@ -26,7 +25,7 @@ function _binary_to_token(arrayBuffer: ArrayBuffer, identifiers: string[], const
     f = new DataView(arrayBuffer.slice(1));
   }
   const start_line = f.getUint32(idx, true);
-  const token: Token = {type: getKeyByValue(TokenType, type)!, start_line};
+  const token: Token = {type, start_line};
 	switch (type) {
 		case TokenType.ANNOTATION:
     case TokenType.IDENTIFIER: {

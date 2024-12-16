@@ -3,12 +3,12 @@ import { DataReader, decoder, ERR_FAIL_COND_V_MSG, VERSION_MAJOR, VERSION_MINOR 
 const PACK_HEADER_MAGIC = 0x43504447;
 const PACK_FORMAT_VERSION = 2;
 
-enum PackFlags {
+const enum PackFlags {
 	PACK_DIR_ENCRYPTED = 1 << 0,
 	PACK_REL_FILEBASE = 1 << 1,
 };
 
-enum PackFileFlags {
+const enum PackFileFlags {
 	PACK_FILE_ENCRYPTED = 1 << 0,
 	PACK_FILE_REMOVAL = 1 << 1,
 };

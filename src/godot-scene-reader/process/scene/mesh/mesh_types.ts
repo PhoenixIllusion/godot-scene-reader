@@ -1,9 +1,9 @@
 
-export enum BlendShapeMode {
+export const enum BlendShapeMode {
   BLEND_SHAPE_MODE_NORMALIZED = 0,
   BLEND_SHAPE_MODE_RELATIVE = 1
 }
-export enum ArrayType {
+export const enum ArrayType {
   ARRAY_VERTEX = 0, // RG32F (2D), RGB32F, RGBA16 (compressed)
   ARRAY_NORMAL = 1, // RG16
   ARRAY_TANGENT = 2, // BA16 (with normal) or A16 (with vertex, when compressed)
@@ -20,7 +20,7 @@ export enum ArrayType {
   ARRAY_MAX = 13
 }
 
-export enum PrimitiveType {
+export const enum PrimitiveType {
   PRIMITIVE_POINTS,
   PRIMITIVE_LINES,
   PRIMITIVE_LINE_STRIP,
@@ -29,7 +29,7 @@ export enum PrimitiveType {
   PRIMITIVE_MAX,
 }
 
-export enum ArrayCustomFormat {
+export const enum ArrayCustomFormat {
   ARRAY_CUSTOM_RGBA8_UNORM,
   ARRAY_CUSTOM_RGBA8_SNORM,
   ARRAY_CUSTOM_RG_HALF,
@@ -41,7 +41,7 @@ export enum ArrayCustomFormat {
   ARRAY_CUSTOM_MAX
 }
 
-export enum ArrayFormat {
+export const enum ArrayFormat {
   /* ARRAY FORMAT FLAGS */
   ARRAY_FORMAT_VERTEX = 1 << ArrayType.ARRAY_VERTEX,
   ARRAY_FORMAT_NORMAL = 1 << ArrayType.ARRAY_NORMAL,

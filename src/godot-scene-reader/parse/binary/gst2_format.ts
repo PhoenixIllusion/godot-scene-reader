@@ -1,4 +1,4 @@
-export enum ImageFormat {
+export const enum ImageFormat {
   FORMAT_L8, //luminance
   FORMAT_LA8, //luminance-alpha
   FORMAT_R8,
@@ -41,18 +41,18 @@ export enum ImageFormat {
   FORMAT_MAX
 };
 
-export enum DataFormat {
+export const enum DataFormat {
   DATA_FORMAT_IMAGE,
   DATA_FORMAT_PNG,
   DATA_FORMAT_WEBP,
   DATA_FORMAT_BASIS_UNIVERSAL,
 };
 
-enum Version {
+const enum Version {
   FORMAT_VERSION = 1
 };
 
-enum FormatBits {
+const enum FormatBits {
   FORMAT_BIT_STREAM = 1 << 22,
   FORMAT_BIT_HAS_MIPMAPS = 1 << 23,
   FORMAT_BIT_DETECT_3D = 1 << 24,

@@ -1,4 +1,4 @@
-export enum BIN {
+export const enum BIN {
 	//numbering must be different from variant, in case new variant types are added (variant must be always contiguous for jumptable optimization)
 	VARIANT_NIL = 1,
 	VARIANT_BOOL = 2,

@@ -1,4 +1,4 @@
-export enum TokenType {
+export const enum TokenType {
   EMPTY,
   // Basic
   ANNOTATION,

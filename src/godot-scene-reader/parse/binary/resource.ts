@@ -5,7 +5,7 @@ import { parse_variant, ResourceData, VariantType } from "./variant";
 
 const FORMAT_VERSION = 6;
 
-enum FORMAT_FLAGS {
+const enum FORMAT_FLAGS {
   FORMAT_FLAG_NAMED_SCENE_IDS = 1,
   FORMAT_FLAG_UIDS = 2,
   FORMAT_FLAG_REAL_T_IS_DOUBLE = 4,

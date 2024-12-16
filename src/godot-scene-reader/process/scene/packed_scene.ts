@@ -2,12 +2,12 @@ import { InternalResourceEntry } from "../../parse/binary/resource";
 import { assertType, unwrap_dictionary, unwrap_string } from "../../parse/binary/util/assert_unpack";
 import { Array, Dictionary, Integer, PackedInt32Array, PackedStringArray, VariantType } from "../../parse/binary/variant";
 
-enum PackedScene_NameMask {
+export const enum PackedScene_NameMask {
   NO_PARENT_SAVED = 0x7FFFFFFF,
   NAME_INDEX_BITS = 18,
   NAME_MASK = (1 << NAME_INDEX_BITS) - 1,
 };
-enum PackedScene_Flags {
+export const enum PackedScene_Flags {
   FLAG_ID_IS_PATH = (1 << 30),
   TYPE_INSTANTIATED = 0x7FFFFFFF,
   FLAG_INSTANCE_IS_PLACEHOLDER = (1 << 30),
