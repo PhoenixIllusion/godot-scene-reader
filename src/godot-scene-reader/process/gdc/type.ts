@@ -1,4 +1,5 @@
-import { VariantType } from "../../parse/binary/variant";
+import { Constant } from "../../parse/binary/gdc";
+import { Nil, VariantType } from "../../parse/binary/variant";
 import { BIN } from "../../parse/binary/variant_binary";
 import { BinaryParser } from "./parser";
 
@@ -39,10 +40,9 @@ export const enum PropertyUsageFlags {
 }
 
 class PropertyInfo {
-  type: BIN = BIN.VARIANT_NIL;
-  name: string = "";
   class_name: string = "";
   usage: number = 0;
+  constructor(public type: string, public name: string) {}
 } 
 
 
@@ -98,8 +98,10 @@ export class Node {
 export class ExpressionNode extends Node {
   reduced: boolean | null = null;
   is_constant: boolean | null = null;
+  reduced_value: string = '';
 }
 
+const valid_annotations: Record<string, AnnotationInfo> = {};
 export class AnnotationNode extends Node {
   name: string = "";
   arguments: ExpressionNode[] = []
@@ -110,6 +112,7 @@ export class AnnotationNode extends Node {
   is_resolved = false;
 
   applies_to(p_target_kinds: AnnotationInfo_TargetKind) {
+    this.info = valid_annotations[this.name];
     return (this.info.target_kind & p_target_kinds) > 0;
   }
   apply(_parser: BinaryParser, _p_target: Node, _p_class: ClassNode | null) {
@@ -301,7 +304,6 @@ export const enum ClassMemberType {
 };
 
 export type ClassMemberSource = ClassNode | ConstantNode | FunctionNode | SignalNode | VariableNode | EnumNode | EnumValue | AnnotationNode | undefined;
-
 export class ClassMember {
   type: ClassMemberType;
   get_type_name(): string {
@@ -387,8 +389,8 @@ export class ContinueNode extends Node {
 };
 
 interface DictionaryNode_Pair {
-  key: ExpressionNode | null = null;
-  value: ExpressionNode | null = null;
+  key: ExpressionNode | null;
+  value: ExpressionNode | null;
 };
 
 export const enum DictionaryNode_Style {
@@ -462,6 +464,7 @@ export class IdentifierNode extends ExpressionNode {
   source_function: FunctionNode | null = null; // TODO: Rename to disambiguate `function_source`.
   usages = 0; // Useful for binds/iterator variable.
   type = Type.IDENTIFIER;
+  reduced_value: string = '';
 }
 
 export class IfNode extends Node {
@@ -487,7 +490,7 @@ export class LambdaNode extends ExpressionNode {
 };
 
 export class LiteralNode extends ExpressionNode {
-  value: VariantType | null = null;
+  value: string | Constant | null = null;
   type = Type.LITERAL;
 };
 
@@ -526,8 +529,8 @@ export const enum PatternNode_Type {
 }
 
 interface PatternNode_Pair {
-  key: ExpressionNode | null = null;
-  value_pattern: PatternNode | null = null;
+  key: ExpressionNode | null;
+  value_pattern: PatternNode | null;
 }
 
 type PatterNodeValue = LiteralNode | IdentifierNode | ExpressionNode | null;
@@ -648,7 +651,7 @@ export class VariableNode extends AssignableNode {
   type = Type.VARIABLE;
 
 
-  export_info: PropertyInfo;
+  export_info: PropertyInfo = new PropertyInfo("NIL", "");
 };
 
 export class WhileNode extends Node {
@@ -717,7 +720,7 @@ export class SuiteNode extends Node {
   type = Type.SUITE;
 
   has_local(p_name: string) { return this.locals_indices.has(p_name) };
-  get_local(p_name: string) { return this.locals[this.locals_indices.get(p_name)!] };
+  get_local(p_name: string) { return this.locals[this.locals_indices.get(p_name)!] || new SuiteNode_Local(null) };
 
   add_local(p_local: SuiteNode_Local | Suite_Node_Local_T, p_source_function: FunctionNode | null = null) {
     if(p_local instanceof SuiteNode_Local) {
@@ -744,10 +747,66 @@ export const enum AnnotationInfo_TargetKind {
   CLASS_LEVEL = CLASS | VARIABLE | CONSTANT | SIGNAL | FUNCTION,
 }
 
-type AnnotationAction = (p_annotation: AnnotationNode, p_target: Node, p_class: ClassNode); 
+type AnnotationAction = (p_annotation: AnnotationNode, p_target: Node, p_class: ClassNode) => void; 
+
+function register_annotation(methodInfo: MethodInfo, kind: AnnotationInfo_TargetKind) {
+  const info = new AnnotationInfo();
+  info.target_kind = kind;
+  info.info = methodInfo;
+  valid_annotations[methodInfo.name] = info;
+}
+
+export function registerAnnotations() {
+  register_annotation(new MethodInfo("@tool"), AnnotationInfo_TargetKind.SCRIPT);
+  register_annotation(new MethodInfo("@icon", new PropertyInfo("STRING", "icon_path")), AnnotationInfo_TargetKind.SCRIPT);
+  register_annotation(new MethodInfo("@static_unload"), AnnotationInfo_TargetKind.SCRIPT);
+
+  register_annotation(new MethodInfo("@onready"), AnnotationInfo_TargetKind.VARIABLE);
+  // Export annotations.
+  register_annotation(new MethodInfo("@export"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_enum", new PropertyInfo("STRING", "names")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_file", new PropertyInfo("STRING", "filter")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_dir"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_global_file", new PropertyInfo("STRING", "filter")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_global_dir"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_multiline"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_placeholder", new PropertyInfo("STRING", "placeholder")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_range", new PropertyInfo("FLOAT", "min"), new PropertyInfo("FLOAT", "max"), new PropertyInfo("FLOAT", "step"), new PropertyInfo("STRING", "extra_hints")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_exp_easing", new PropertyInfo("STRING", "hints")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_color_no_alpha"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_node_path", new PropertyInfo("STRING", "type")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_flags", new PropertyInfo("STRING", "names")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_flags_2d_render"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_flags_2d_physics"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_flags_2d_navigation"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_flags_3d_render"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_flags_3d_physics"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_flags_3d_navigation"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_flags_avoidance"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_storage"), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_custom", new PropertyInfo("INT", "hint"), new PropertyInfo("STRING", "hint_string"), new PropertyInfo("INT", "usage")), AnnotationInfo_TargetKind.VARIABLE);
+  register_annotation(new MethodInfo("@export_tool_button", new PropertyInfo("STRING", "text"), new PropertyInfo("STRING", "icon")), AnnotationInfo_TargetKind.VARIABLE);
+  // Export grouping annotations.
+  register_annotation(new MethodInfo("@export_category", new PropertyInfo("STRING", "name")), AnnotationInfo_TargetKind.STANDALONE);
+  register_annotation(new MethodInfo("@export_group", new PropertyInfo("STRING", "name"), new PropertyInfo("STRING", "prefix")), AnnotationInfo_TargetKind.STANDALONE);
+  register_annotation(new MethodInfo("@export_subgroup", new PropertyInfo("STRING", "name"), new PropertyInfo("STRING", "prefix")), AnnotationInfo_TargetKind.STANDALONE);
+  // Warning annotations.
+  register_annotation(new MethodInfo("@warning_ignore", new PropertyInfo("STRING", "warning")), AnnotationInfo_TargetKind.CLASS_LEVEL | AnnotationInfo_TargetKind.STATEMENT);
+  // Networking.
+  register_annotation(new MethodInfo("@rpc", new PropertyInfo("STRING", "mode"), new PropertyInfo("STRING", "sync"), new PropertyInfo("STRING", "transfer_mode"), new PropertyInfo("INT", "transfer_channel")), AnnotationInfo_TargetKind.FUNCTION);
+
+}
+
 
 export class AnnotationInfo {
   target_kind = AnnotationInfo_TargetKind.NONE; // Flags.
   apply: AnnotationAction | null = null;
-  info: any;//MethodInfo;
+  info: MethodInfo = {name: '', props: []};
+}
+
+class MethodInfo {
+  public props: PropertyInfo[];
+  constructor(public name: string,  ... props: PropertyInfo[]) {
+    this.props = props;
+   }
 }
