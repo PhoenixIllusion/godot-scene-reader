@@ -48,10 +48,12 @@ export const enum DataFormat {
   DATA_FORMAT_BASIS_UNIVERSAL,
 };
 
+  // @ts-ignore
 const enum Version {
   FORMAT_VERSION = 1
 };
 
+  // @ts-ignore
 const enum FormatBits {
   FORMAT_BIT_STREAM = 1 << 22,
   FORMAT_BIT_HAS_MIPMAPS = 1 << 23,

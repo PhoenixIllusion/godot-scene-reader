@@ -1,10 +1,6 @@
 import { DataReader, decoder } from "../../util/data-reader";
 import { DataFormat, get_format_block_size, get_format_pixel_rshift, get_format_pixel_size, ImageFormat } from "./gst2_format";
-import { getKeyByValue } from "./util/enum";
 import { GodotReader } from "./util/reader";
-
-
-
 
 function load_image(f: GodotReader, data_format: DataFormat, w: number, h: number, mipmaps: number, format: ImageFormat, p_size_limit: number) {
   let sw = w;
@@ -32,8 +28,8 @@ function load_image(f: GodotReader, data_format: DataFormat, w: number, h: numbe
 			}
 
 			mipmap_images.push({width: sw, height: sh, mipmap_level: i,
-        data_format: getKeyByValue(DataFormat, data_format)!,
-        image_format: getKeyByValue(ImageFormat, format)!,
+        data_format: data_format,
+        image_format: format,
         buffer: pv
       });
 
@@ -65,8 +61,8 @@ function data_image(f: GodotReader, w: number, h: number, mipmaps: number, forma
     const pv = f.get_buffer(size);
 
     mipmap_images.push({width: w, height: h, mipmap_level: i,
-      data_format: getKeyByValue(DataFormat, DataFormat.DATA_FORMAT_IMAGE)!,
-      image_format: getKeyByValue(ImageFormat, format)!,
+      data_format: DataFormat.DATA_FORMAT_IMAGE,
+      image_format: format,
       buffer: pv
     });
 
@@ -89,8 +85,8 @@ export interface cTexEntry {
   height: number;
   mipmap_level: number;
 
-  data_format: string;
-  image_format: string;
+  data_format: DataFormat;
+  image_format: ImageFormat;
 
   buffer: Uint8Array
 }

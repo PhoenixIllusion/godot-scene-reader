@@ -9,54 +9,54 @@ function canonicalize_path(path: string): string {
 }
 
 function is_node_name(type: TokenType): boolean {
-	// This is meant to allow keywords with the $ notation, but not as general identifiers.
-	switch (type) {
-		case TokenType.IDENTIFIER:
-		case TokenType.AND:
-		case TokenType.AS:
-		case TokenType.ASSERT:
-		case TokenType.AWAIT:
-		case TokenType.BREAK:
-		case TokenType.BREAKPOINT:
-		case TokenType.CLASS_NAME:
-		case TokenType.CLASS:
-		case TokenType.CONST:
-		case TokenType.CONST_PI:
-		case TokenType.CONST_INF:
-		case TokenType.CONST_NAN:
-		case TokenType.CONST_TAU:
-		case TokenType.CONTINUE:
-		case TokenType.ELIF:
-		case TokenType.ELSE:
-		case TokenType.ENUM:
-		case TokenType.EXTENDS:
-		case TokenType.FOR:
-		case TokenType.FUNC:
-		case TokenType.IF:
-		case TokenType.IN:
-		case TokenType.IS:
-		case TokenType.MATCH:
-		case TokenType.NAMESPACE:
-		case TokenType.NOT:
-		case TokenType.OR:
-		case TokenType.PASS:
-		case TokenType.PRELOAD:
-		case TokenType.RETURN:
-		case TokenType.SELF:
-		case TokenType.SIGNAL:
-		case TokenType.STATIC:
-		case TokenType.SUPER:
-		case TokenType.TRAIT:
-		case TokenType.UNDERSCORE:
-		case TokenType.VAR:
-		case TokenType.VOID:
-		case TokenType.WHILE:
-		case TokenType.WHEN:
-		case TokenType.YIELD:
-			return true;
-		default:
-			return false;
-	}
+  // This is meant to allow keywords with the $ notation, but not as general identifiers.
+  switch (type) {
+    case TokenType.IDENTIFIER:
+    case TokenType.AND:
+    case TokenType.AS:
+    case TokenType.ASSERT:
+    case TokenType.AWAIT:
+    case TokenType.BREAK:
+    case TokenType.BREAKPOINT:
+    case TokenType.CLASS_NAME:
+    case TokenType.CLASS:
+    case TokenType.CONST:
+    case TokenType.CONST_PI:
+    case TokenType.CONST_INF:
+    case TokenType.CONST_NAN:
+    case TokenType.CONST_TAU:
+    case TokenType.CONTINUE:
+    case TokenType.ELIF:
+    case TokenType.ELSE:
+    case TokenType.ENUM:
+    case TokenType.EXTENDS:
+    case TokenType.FOR:
+    case TokenType.FUNC:
+    case TokenType.IF:
+    case TokenType.IN:
+    case TokenType.IS:
+    case TokenType.MATCH:
+    case TokenType.NAMESPACE:
+    case TokenType.NOT:
+    case TokenType.OR:
+    case TokenType.PASS:
+    case TokenType.PRELOAD:
+    case TokenType.RETURN:
+    case TokenType.SELF:
+    case TokenType.SIGNAL:
+    case TokenType.STATIC:
+    case TokenType.SUPER:
+    case TokenType.TRAIT:
+    case TokenType.UNDERSCORE:
+    case TokenType.VAR:
+    case TokenType.VOID:
+    case TokenType.WHILE:
+    case TokenType.WHEN:
+    case TokenType.YIELD:
+      return true;
+    default:
+      return false;
+  }
 }
 
 function is_identifier(type: TokenType): boolean {
@@ -80,8 +80,8 @@ function get_identifier(token: Token): string {
   return token.literal?.toString() as string
 }
 
-function vformat(template: string, ... values: any[]) {
-  return template.replace(/\%./g, function(match, number) { return typeof values[number] !== 'undefined' ? values[number] : match; });
+function vformat(template: string, ...values: any[]) {
+  return template.replace(/\%./g, function (match, number) { return typeof values[number] !== 'undefined' ? values[number] : match; });
 }
 
 function tryOrThrow<T extends Node>(obj: T | null): T {
@@ -89,14 +89,14 @@ function tryOrThrow<T extends Node>(obj: T | null): T {
   throw new Error("obj should not be undefined")
 }
 
-function push_error(err: string, ... extras: any) {
+function push_error(err: string, ...extras: any) {
   throw new Error(err, { cause: extras });
 }
 
 export class Tokenizer {
   current = 0;
   current_line = 1;
-  
+
   pending_indents = 0;
 
   last_token_was_newline = false;
@@ -106,8 +106,8 @@ export class Tokenizer {
   multiline_mode = false;
 
   private tokens: Token[];
-  private token_lines: Record<number,number>;
-  private token_columns: Record<number,number>
+  private token_lines: Record<number, number>;
+  private token_columns: Record<number, number>
 
   constructor(gdcFile: GdcFile) {
     this.tokens = gdcFile.tokens;
@@ -124,7 +124,7 @@ export class Tokenizer {
       this.last_token_was_newline = true;
       return newline;
     }
-  
+
     // Resolve pending indentation change.
     if (this.pending_indents > 0) {
       this.pending_indents--;
@@ -135,31 +135,31 @@ export class Tokenizer {
       return indent;
     } else if (this.pending_indents < 0) {
       this.pending_indents++;
-      const dedent : Token = {
+      const dedent: Token = {
         type: TokenType.DEDENT,
         start_line: this.current_line
       }
       return dedent;
     }
-  
+
     if (this.current >= this.tokens.length) {
       if (this.indent_stack.length) {
         this.pending_indents -= this.indent_stack.length;
         this.indent_stack.length = 0;
         return this.scan();
       }
-      const eof: Token  = {
+      const eof: Token = {
         type: TokenType.TK_EOF,
         start_line: this.current_line
       };
-      
+
       return eof;
     };
-  
+
     if (!this.last_token_was_newline && this.token_lines[this.current]) {
       this.current_line = this.token_lines[this.current];
       const current_column = this.token_columns[this.current];
-  
+
       // Check if there's a need to indent/dedent.
       if (!this.multiline_mode) {
         let previous_indent = 0;
@@ -179,19 +179,19 @@ export class Tokenizer {
             previous_indent = this.indent_stack.slice(-1)[0];
           }
         }
-  
+
         const newline: Token = {
           type: TokenType.NEWLINE,
           start_line: this.current_line
         }
         this.last_token_was_newline = true;
-  
+
         return newline;
       }
     }
-  
+
     this.last_token_was_newline = false;
-  
+
     const token = this.tokens[this.current++];
     return token;
   }
@@ -209,7 +209,7 @@ export class BinaryParser {
   index = 0;
 
   can_break = false;
-	can_continue = false;
+  can_continue = false;
   in_lambda = false;
   lambda_ended = false;
 
@@ -245,7 +245,7 @@ export class BinaryParser {
     return false;
   }
   get is_multiline(): boolean {
-    if(this.multiline_stack.length == 0) {
+    if (this.multiline_stack.length == 0) {
       return false;
     }
     return this.multiline_stack.slice(-1)[0];
@@ -301,9 +301,9 @@ export class BinaryParser {
   push_multiline(p_state: boolean) {
     this.multiline_stack.push(p_state);
     this.tokenizer.multiline_mode = p_state;
-		while (this.current.type == TokenType.NEWLINE || this.current.type == TokenType.INDENT || this.current.type == TokenType.DEDENT) {
+    while (this.current.type == TokenType.NEWLINE || this.current.type == TokenType.INDENT || this.current.type == TokenType.DEDENT) {
       this.current = this.tokenizer.scan();
-		}
+    }
   }
   pop_multiline() {
     this.multiline_stack.pop();
@@ -384,12 +384,13 @@ export class BinaryParser {
           PUSH_PENDING_ANNOTATIONS_TO_HEAD();
           this.advance();
           this.parse_extends();
-					this.end_statement("superclass");
+          this.end_statement("superclass");
           break;
         case TokenType.TK_EOF:
           PUSH_PENDING_ANNOTATIONS_TO_HEAD();
           can_have_class_or_extends = false;
           break;
+        // @ts-ignore fallthrough
         case TokenType.LITERAL:
           const literal = this.current.literal as Constant;
           if (literal.type_s == 'STRING') {
@@ -410,13 +411,13 @@ export class BinaryParser {
     }
   }
 
-  parse_class(p_is_static: boolean): ClassNode | null {
+  parse_class(_p_is_static: boolean): ClassNode | null {
     const n_class: ClassNode = new ClassNode();
-  
+
     const previous_class: ClassNode | null = this.current_class;
     this.current_class = n_class;
     n_class.outer = previous_class;
-  
+
     if (this.consume(TokenType.IDENTIFIER, '(Expected identifier for the class name after "class".)')) {
       n_class.identifier = this.parse_identifier();
       if (n_class.outer) {
@@ -429,21 +430,21 @@ export class BinaryParser {
         n_class.fqcn = n_class.identifier.name;
       }
     }
-  
+
     if (this.match(TokenType.EXTENDS)) {
       this.parse_extends();
     }
-  
+
     this.consume(TokenType.COLON, '(Expected ":" after class declaration.)');
-  
+
     const multiline: boolean = this.match(TokenType.NEWLINE);
-  
+
     if (multiline && !this.consume(TokenType.INDENT, '(Expected indented block after class declaration.)')) {
       this.current_class = previous_class;
-      
+
       return n_class;
     }
-  
+
     if (this.match(TokenType.EXTENDS)) {
       if (n_class.extends_used) {
         push_error('(Cannot use "extends" more than once in the same class.)');
@@ -451,12 +452,12 @@ export class BinaryParser {
       this.parse_extends();
       this.end_statement("superclass");
     }
-  
+
     this.parse_class_body(multiline);
     if (multiline) {
       this.consume(TokenType.DEDENT, '(Missing unindent at the end of the class body.)');
     }
-  
+
     this.current_class = previous_class;
     return n_class;
   }
@@ -607,6 +608,7 @@ export class BinaryParser {
         case TokenType.DEDENT:
           class_end = true;
           break;
+        // @ts-ignore
         case TokenType.LITERAL:
           const literal = this.current.literal as Constant;
           if (literal.type_s == "STRING") {
@@ -773,13 +775,13 @@ export class BinaryParser {
       case VariableNode_PropertyStyle.PROP_INLINE: {
         const _function: FunctionNode = new FunctionNode();
         const identifier: IdentifierNode = new IdentifierNode();
-        
+
         identifier.name = "@" + p_variable.identifier!.name + "_setter";
         _function.identifier = identifier;
         _function.is_static = p_variable.is_static;
-  
+
         this.consume(TokenType.PARENTHESIS_OPEN, '(Expected "(" after "set".)');
-  
+
         const parameter: ParameterNode = new ParameterNode();
         if (this.consume(TokenType.IDENTIFIER, '(Expected parameter name after "(".)')) {
           p_variable.setter_parameter = this.parse_identifier();
@@ -789,7 +791,7 @@ export class BinaryParser {
         }
         this.consume(TokenType.PARENTHESIS_CLOSE, '*(Expected ")" after parameter name.)*');
         this.consume(TokenType.COLON, '*(Expected ":" after ")".)*');
-  
+
         const previous_function: FunctionNode = this.current_function!;
         this.current_function = _function;
         if (p_variable.setter_parameter != null) {
@@ -799,12 +801,12 @@ export class BinaryParser {
           p_variable.setter = _function;
         }
         this.current_function = previous_function;
-        
+
         break;
       }
       case VariableNode_PropertyStyle.PROP_SETGET:
         this.consume(TokenType.EQUAL, '(Expected "=" after "set")');
-        
+
         if (this.consume(TokenType.IDENTIFIER, '(Expected setter function name after "=".)')) {
           p_variable.setter = this.parse_identifier();
         }
@@ -817,34 +819,34 @@ export class BinaryParser {
     switch (p_variable.property) {
       case VariableNode_PropertyStyle.PROP_INLINE: {
         const _function: FunctionNode = new FunctionNode();
-  
+
         if (this.match(TokenType.PARENTHESIS_OPEN)) {
           this.consume(TokenType.PARENTHESIS_CLOSE, '*(Expected ")" after "get(".)*');
           this.consume(TokenType.COLON, '*(Expected ":" after "get()".)*');
         } else {
           this.consume(TokenType.COLON, '(Expected ":" or "(" after "get".)');
         }
-  
+
         const identifier: IdentifierNode = new IdentifierNode();
-        
+
         identifier.name = "@" + p_variable.identifier!.name + "_getter";
         _function.identifier = identifier;
         _function.is_static = p_variable.is_static;
-  
+
         const previous_function: FunctionNode = this.current_function!;
         this.current_function = _function;
-  
+
         const body: SuiteNode = new SuiteNode();
         _function.body = this.parse_suite("getter declaration", body);
         p_variable.getter = _function;
-  
+
         this.current_function = previous_function;
-        
+
         break;
       }
       case VariableNode_PropertyStyle.PROP_SETGET:
         this.consume(TokenType.EQUAL, '(Expected "=" after "get")');
-        
+
         if (this.consume(TokenType.IDENTIFIER, '(Expected getter function name after "=".)')) {
           p_variable.getter = this.parse_identifier();
         }
@@ -856,13 +858,13 @@ export class BinaryParser {
 
   parse_constant(_p_is_static: boolean): ConstantNode | null {
     const constant: ConstantNode = new ConstantNode();
-  
+
     if (!this.consume(TokenType.IDENTIFIER, '(Expected constant name after "const".)')) {
       return null;
     }
-  
+
     constant.identifier = this.parse_identifier();
-  
+
     if (this.match(TokenType.COLON)) {
       if (this.check((TokenType.EQUAL))) {
         // Infer type.
@@ -872,59 +874,59 @@ export class BinaryParser {
         constant.datatype_specifier = this.parse_type();
       }
     }
-  
+
     if (this.consume(TokenType.EQUAL, '(Expected initializer after constant name.)')) {
       // Initializer.
       constant.initializer = this.parse_expression(false);
-  
+
       if (constant.initializer == null) {
         push_error('(Expected initializer expression for constant.)');
-        
+
         return null;
       }
     } else {
-      
+
       return null;
     }
     this.end_statement("constant declaration");
-  
+
     return constant;
   }
   parse_parameter(): ParameterNode | null {
     if (!this.consume(TokenType.IDENTIFIER, '(Expected parameter name.)')) {
       return null;
     }
-  
+
     const parameter: ParameterNode = new ParameterNode();
     parameter.identifier = this.parse_identifier();
-  
+
     if (this.match(TokenType.COLON)) {
       if (this.check((TokenType.EQUAL))) {
         // Infer type.
         parameter.infer_datatype = true;
       } else {
         // Parse type.
-        
+
         parameter.datatype_specifier = this.parse_type();
       }
     }
-  
+
     if (this.match(TokenType.EQUAL)) {
       // Default value.
       parameter.initializer = this.parse_expression(false);
     }
     return parameter;
   }
-  parse_signal(p_is_static: boolean):SignalNode | null {
+  parse_signal(_p_is_static: boolean): SignalNode | null {
     const signal: SignalNode = new SignalNode();
-  
+
     if (!this.consume(TokenType.IDENTIFIER, '(Expected signal name after "signal".)')) {
-      
+
       return null;
     }
-  
+
     signal.identifier = this.parse_identifier();
-  
+
     if (this.check(TokenType.PARENTHESIS_OPEN)) {
       this.push_multiline(true);
       this.advance();
@@ -933,7 +935,7 @@ export class BinaryParser {
           // Allow for trailing comma.
           break;
         }
-  
+
         const parameter: ParameterNode | null = this.parse_parameter();
         if (parameter == null) {
           push_error("Expected signal parameter name.");
@@ -952,37 +954,37 @@ export class BinaryParser {
       this.pop_multiline();
       this.consume(TokenType.PARENTHESIS_CLOSE, '*(Expected closing ")" after signal parameters.)*');
     }
-    
+
     this.end_statement("signal declaration");
-  
+
     return signal;
   }
-  parse_enum(p_is_static: boolean): EnumNode | null {
+  parse_enum(_p_is_static: boolean): EnumNode | null {
     const enum_node: EnumNode = new EnumNode();
     let named: boolean = false;
-  
+
     if (this.match(TokenType.IDENTIFIER)) {
       enum_node.identifier = this.parse_identifier();
       named = true;
     }
-  
-	  this.push_multiline(true);
+
+    this.push_multiline(true);
     this.consume(TokenType.BRACE_OPEN, vformat('(Expected "{" after %s.)', named ? "enum name" : '("enum")'));
-  
-    const elements: Map<string,number> = new Map();
-  
+
+    const elements: Map<string, number> = new Map();
+
     do {
       if (this.check(TokenType.BRACE_CLOSE)) {
         break; // Allow trailing comma.
       }
       if (this.consume(TokenType.IDENTIFIER, '(Expected identifier for enum key.)')) {
         const identifier: IdentifierNode = this.parse_identifier();
-  
+
         const item = new EnumValue();
         item.identifier = identifier;
         item.parent_enum = enum_node;
         item.line = this.previous.start_line;
-  
+
         if (elements.has(item.identifier.name)) {
           push_error(vformat('(Name "%s" was already in this enum (at line %d).)', item.identifier.name, elements.get(item.identifier.name)), item.identifier);
         } else if (!named) {
@@ -990,9 +992,9 @@ export class BinaryParser {
             push_error(vformat('(Name "%s" is already used as a class %s.)', item.identifier.name, this.current_class!.get_member(item.identifier.name).get_type_name()));
           }
         }
-  
+
         elements.set(item.identifier.name, item.line);
-  
+
         if (this.match(TokenType.EQUAL)) {
           const value: ExpressionNode | null = this.parse_expression(false);
           if (value == null) {
@@ -1000,7 +1002,7 @@ export class BinaryParser {
           }
           item.custom_value = value;
         }
-  
+
         item.index = enum_node.values.length;
         enum_node.values.push(item);
         if (!named) {
@@ -1012,9 +1014,9 @@ export class BinaryParser {
 
     this.pop_multiline();
     this.consume(TokenType.BRACE_CLOSE, '(Expected closing "}" for enum.)');
-    
+
     this.end_statement("enum");
-  
+
     return enum_node;
   }
   parse_function_signature(p_function: FunctionNode, p_body: SuiteNode, p_type: string): void {
@@ -1046,18 +1048,18 @@ export class BinaryParser {
         }
       } while (this.match(TokenType.COMMA));
     }
-  
+
     this.pop_multiline();
     this.consume(TokenType.PARENTHESIS_CLOSE, vformat('*(Expected closing ")" after %s parameters.)*', p_type));
-  
+
     if (this.match(TokenType.FORWARD_ARROW)) {
-      
+
       p_function.return_type = this.parse_type(true);
       if (p_function.return_type == null) {
         push_error('(Expected return type or "void" after ".".)');
       }
     }
-  
+
     if (!p_function.source_lambda && p_function.identifier && p_function.identifier.name == '_static_init') {
       if (!p_function.is_static) {
         push_error('(Static constructor must be declared static.)');
@@ -1067,46 +1069,56 @@ export class BinaryParser {
       }
       this.current_class!.has_static_data = true;
     }
-  
+
     // TODO: Improve token consumption so it synchronizes to a statement boundary. This way we can get into the function body with unrecognized tokens.
     this.consume(TokenType.COLON, vformat('(Expected ":" after %s declaration.)', p_type));
   }
   parse_function(p_is_static: boolean): FunctionNode | null {
     const _function: FunctionNode = new FunctionNode();
-  
+
     if (!this.consume(TokenType.IDENTIFIER, '(Expected function name after "func".)')) {
       return null;
     }
-  
-    const previous_function: FunctionNode|null = this.current_function;
+
+    const previous_function: FunctionNode | null = this.current_function;
     this.current_function = _function;
-  
+
     _function.identifier = this.parse_identifier();
     _function.is_static = p_is_static;
-  
+
     const body: SuiteNode = new SuiteNode();
     const previous_suite: SuiteNode | null = this.current_suite;
     this.current_suite = body;
-  
+
     this.push_multiline(true);
     this.consume(TokenType.PARENTHESIS_OPEN, '(Expected opening "(" after function name.)');
     this.parse_function_signature(_function, body, "function");
-  
+
     this.current_suite = previous_suite;
     _function.body = this.parse_suite("function declaration", body);
-  
+
     this.current_function = previous_function;
-    
+
     return _function;
   }
   parse_annotation(p_valid_targets: number): AnnotationNode | null {
     const annotation: AnnotationNode = new AnnotationNode()
     annotation.name = this.previous.literal as string;
+
+		if (!annotation.applies_to(p_valid_targets)) {
+			if (annotation.applies_to(AnnotationInfo_TargetKind.SCRIPT)) {
+				push_error(vformat('(Annotation "%s" must be at the top of the script, before "extends" and "class_name".)', annotation.name));
+			} else {
+				push_error(vformat('(Annotation "%s" is not allowed in this level.)', annotation.name));
+			}
+		}
+
     if (this.check(TokenType.PARENTHESIS_OPEN)) {
       this.push_multiline(true);
       this.advance();
+
       do {
-        if(this.check(TokenType.PARENTHESIS_CLOSE)) {
+        if (this.check(TokenType.PARENTHESIS_CLOSE)) {
           break;
         }
         const argument = this.parse_expression(false)
@@ -1129,28 +1141,28 @@ export class BinaryParser {
     suite.parent_block = this.current_suite!;
     suite.parent_function = this.current_function;
     this.current_suite = suite;
-  
+
     if (!p_for_lambda && suite.parent_block != null && suite.parent_block.is_in_loop) {
       // Do not reset to false if true is set before calling this.parse_suite().
       suite.is_in_loop = true;
     }
-  
+
     let multiline: boolean = false;
-  
+
     if (this.match(TokenType.NEWLINE)) {
       multiline = true;
     }
-  
+
     if (multiline) {
       if (!this.consume(TokenType.INDENT, `(Expected indented block after ${p_context}.)`)) {
         this.current_suite = suite.parent_block;
-        
+
         return suite;
       }
     }
-  
+
     let error_count = 0;
-  
+
     do {
       if (this.is_at_end() || (!multiline && this.previous.type == TokenType.SEMICOLON && this.check(TokenType.NEWLINE))) {
         break;
@@ -1164,7 +1176,7 @@ export class BinaryParser {
         continue;
       }
       suite.statements.push(statement);
-  
+
       // Register locals.
       switch (statement.type) {
         case Type.VARIABLE: {
@@ -1194,19 +1206,19 @@ export class BinaryParser {
         default:
           break;
       }
-  
+
     } while ((multiline || this.previous.type == TokenType.SEMICOLON) && !this.check(TokenType.DEDENT) && !this.lambda_ended && !this.is_at_end());
     if (multiline) {
       if (!this.lambda_ended) {
         this.consume(TokenType.DEDENT, vformat('(Missing unindent at the end of %s.)', p_context));
-  
+
       } else {
         this.match(TokenType.DEDENT);
       }
     } else if (this.previous.type == TokenType.SEMICOLON) {
       this.consume(TokenType.NEWLINE, vformat('(Expected newline after ";" at the end of %s.)', p_context));
     }
-  
+
     if (p_for_lambda) {
       this.lambda_ended = true;
     }
@@ -1279,18 +1291,18 @@ export class BinaryParser {
           // If this fails the expression will be null, but that's the same as no return, so it's fine.
           n_return.return_value = this.parse_expression(false);
         }
-        
+
         result = n_return;
-  
+
         this.current_suite!.has_return = true;
-  
+
         this.end_statement("return statement");
         break;
       }
       case TokenType.BREAKPOINT:
         this.advance();
         result = new BreakpointNode();
-        
+
         this.end_statement('("breakpoint")');
         break;
       case TokenType.ASSERT:
@@ -1299,7 +1311,7 @@ export class BinaryParser {
         break;
       case TokenType.ANNOTATION: {
         this.advance();
-        const annotation: AnnotationNode|null = this.parse_annotation(AnnotationInfo_TargetKind.STATEMENT);
+        const annotation: AnnotationNode | null = this.parse_annotation(AnnotationInfo_TargetKind.STATEMENT);
         if (annotation != null) {
           this.annotation_stack.push(annotation);
         }
@@ -1323,33 +1335,33 @@ export class BinaryParser {
         }
         this.lambda_ended = this.lambda_ended || has_ended_lambda;
         result = expression;
-  
+
         break;
       }
     }
-  
+
     if (result != null && !(annotations.length == 0)) {
       annotations.forEach(annotation => {
         result.annotations.push(annotation);
       })
     }
-  
+
     return result;
   }
 
   parse_assert(): AssertNode | null {
     // TODO: Add assert message.
     const assert: AssertNode = new AssertNode();
-  
+
     this.push_multiline(true);
     this.consume(TokenType.PARENTHESIS_OPEN, '(Expected "(" after "assert".)');
-  
+
     assert.condition = this.parse_expression(false);
     if (assert.condition == null) {
       push_error("Expected expression to assert.");
       return null;
     }
-  
+
     if (this.match(TokenType.COMMA) && !this.check(TokenType.PARENTHESIS_CLOSE)) {
       assert.message = this.parse_expression(false);
       if (assert.message == null) {
@@ -1362,7 +1374,7 @@ export class BinaryParser {
     this.pop_multiline();
     this.consume(TokenType.PARENTHESIS_CLOSE, '*(Expected ")" after assert expression.)*');
     this.end_statement('("assert")');
-  
+
     return assert;
   }
   parse_break(): BreakNode {
@@ -1370,7 +1382,7 @@ export class BinaryParser {
       push_error('(Cannot use "break" outside of a loop.)');
     }
     const break_node: BreakNode = new BreakNode();
-    
+
     this.end_statement('("break")');
     return break_node;
   }
@@ -1380,46 +1392,46 @@ export class BinaryParser {
     }
     this.current_suite!.has_continue = true;
     const cont: ContinueNode = new ContinueNode();
-    
+
     this.end_statement('("continue")');
     return cont;
   }
   parse_for(): ForNode {
     const n_for: ForNode = new ForNode();
-  
+
     if (this.consume(TokenType.IDENTIFIER, '(Expected loop variable name after "for".)')) {
       n_for.variable = this.parse_identifier();
     }
-  
+
     if (this.match(TokenType.COLON)) {
       n_for.datatype_specifier = this.parse_type();
       if (n_for.datatype_specifier == null) {
         push_error('(Expected type specifier after ":".)');
       }
     }
-  
+
     if (n_for.datatype_specifier == null) {
       this.consume(TokenType.IN, '(Expected "in" or ":" after "for" variable name.)');
     } else {
       this.consume(TokenType.IN, '(Expected "in" after "for" variable type specifier.)');
     }
-  
+
     n_for.list = this.parse_expression(false);
-  
+
     if (!n_for.list) {
       push_error('(Expected iterable after "in".)');
     }
-  
+
     this.consume(TokenType.COLON, '(Expected ":" after "for" condition.)');
-  
+
     // Save break/continue state.
     let could_break: boolean = this.can_break;
     let could_continue: boolean = this.can_continue;
-  
+
     // Allow break/continue.
     this.can_break = true;
     this.can_continue = true;
-  
+
     const suite: SuiteNode = new SuiteNode();
     if (n_for.variable) {
       const local = this.current_suite!.get_local(n_for.variable.name);
@@ -1433,39 +1445,39 @@ export class BinaryParser {
     // Reset break/continue state.
     this.can_break = could_break;
     this.can_continue = could_continue;
-  
+
     return n_for;
   }
-  parse_if(p_token: string = "if"): IfNode|null {
+  parse_if(p_token: string = "if"): IfNode | null {
     const n_if: IfNode = new IfNode();
-  
+
     n_if.condition = this.parse_expression(false);
     if (n_if.condition == null) {
       push_error(vformat('(Expected conditional expression after "%s".)', p_token));
     }
-  
+
     this.consume(TokenType.COLON, vformat('(Expected ":" after "%s" condition.)', p_token));
-  
+
     n_if.true_block = this.parse_suite(vformat('("%s" block)', p_token));
     n_if.true_block!.parent_if = n_if;
-  
+
     if (n_if.true_block!.has_continue) {
       this.current_suite!.has_continue = true;
     }
-  
+
     if (this.match(TokenType.ELIF)) {
       const else_block: SuiteNode = new SuiteNode();
       else_block.parent_function = this.current_function;
       else_block.parent_block = this.current_suite;
-  
+
       const previous_suite: SuiteNode | null = this.current_suite;
       this.current_suite = else_block;
-  
+
       const elif: IfNode = this.parse_if("elif")!;
       else_block.statements.push(elif);
-      
+
       n_if.false_block = else_block;
-  
+
       this.current_suite = previous_suite;
     } else if (this.match(TokenType.ELSE)) {
       this.consume(TokenType.COLON, '(Expected ":" after "else".)');
@@ -1477,38 +1489,38 @@ export class BinaryParser {
     if (n_if.false_block != null && n_if.false_block.has_continue) {
       this.current_suite!.has_continue = true;
     }
-  
+
     return n_if;
   }
   parse_match(): MatchNode {
     const match_node: MatchNode = new MatchNode();
-  
+
     match_node.test = this.parse_expression(false);
     if (match_node.test == null) {
       push_error('(Expected expression to test after "this.match".)');
     }
-  
+
     this.consume(TokenType.COLON, '(Expected ":" after "this.match" expression.)');
     this.consume(TokenType.NEWLINE, '(Expected a newline after "this.match" statement.)');
-  
+
     if (!this.consume(TokenType.INDENT, '(Expected an indented block after "this.match" statement.)')) {
-      
+
       return match_node;
     }
-  
+
     let all_have_return: boolean = true;
     let have_wildcard: boolean = false;
-  
+
     const match_branch_annotation_stack: AnnotationNode[] = [];
-  
+
     while (!this.check(TokenType.DEDENT) && !this.is_at_end()) {
       if (this.match(TokenType.PASS)) {
         this.consume(TokenType.NEWLINE, '(Expected newline after "pass".)');
         continue;
       }
-  
+
       if (this.match(TokenType.ANNOTATION)) {
-        const annotation: AnnotationNode|null = this.parse_annotation(AnnotationInfo_TargetKind.STATEMENT);
+        const annotation: AnnotationNode | null = this.parse_annotation(AnnotationInfo_TargetKind.STATEMENT);
         if (annotation == null) {
           continue;
         }
@@ -1519,39 +1531,39 @@ export class BinaryParser {
         match_branch_annotation_stack.push(annotation);
         continue;
       }
-  
+
       const branch: MatchBranchNode | null = this.parse_match_branch();
       if (branch == null) {
         this.advance();
         continue;
       }
-  
+
       match_branch_annotation_stack.forEach((annotation: AnnotationNode) => {
         branch.annotations.push(annotation);
       })
       match_branch_annotation_stack.length = 0;
-  
+
       have_wildcard = have_wildcard || branch.has_wildcard;
       all_have_return = all_have_return && branch.block!.has_return;
       match_node.branches.push(branch);
     }
     this.consume(TokenType.DEDENT, '(Expected an indented block after "this.match" statement.)');
-  
+
     if (all_have_return && have_wildcard) {
       this.current_suite!.has_return = true;
     }
-  
+
     match_branch_annotation_stack.forEach((annotation: AnnotationNode) => {
       push_error(vformat('(Annotation "%s" does not precede a valid target, so it will have no effect.)', annotation.name), annotation);
     });
     match_branch_annotation_stack.length = 0;
-  
+
     return match_node;
   }
   parse_match_branch(): MatchBranchNode | null {
     const branch: MatchBranchNode = new MatchBranchNode();
     let has_bind: boolean = false;
-  
+
     do {
       const pattern: PatternNode | null = this.parse_match_pattern();
       if (pattern == null) {
@@ -1570,29 +1582,29 @@ export class BinaryParser {
       }
       branch.patterns.push(pattern);
     } while (this.match(TokenType.COMMA));
-  
+
     if (branch.patterns.length == 0) {
       push_error('(No pattern found for "this.match" branch.)');
     }
-  
+
     let has_guard: boolean = false;
     if (this.match(TokenType.WHEN)) {
       // Pattern guard.
       // Create block for guard because it also needs to access the bound variables from patterns, and we don't want to add them to the outer scope.
       branch.guard_body = new SuiteNode();
       if (branch.patterns.length > 0) {
-        [... branch.patterns[0].binds.entries()].map(([key,value]) => ({key,value})).forEach((E) => {
+        [...branch.patterns[0].binds.entries()].map(([key, value]) => ({ key, value })).forEach((E) => {
           const local = new SuiteNode_Local(E.value, this.current_function);
           local.type = SuiteNode_Local_Type.PATTERN_BIND;
           branch.guard_body!.add_local(local);
         });
       }
-  
+
       const parent_block: SuiteNode | null = this.current_suite;
       branch.guard_body.parent_block = parent_block;
       this.current_suite = branch.guard_body;
-  
-      const guard: ExpressionNode|null = this.parse_expression(false);
+
+      const guard: ExpressionNode | null = this.parse_expression(false);
       if (guard == null) {
         push_error('(Expected expression for pattern guard after "when".)');
       } else {
@@ -1602,56 +1614,55 @@ export class BinaryParser {
       has_guard = true;
       branch.has_wildcard = false; // If it has a guard, the wildcard might still not this.match.
     }
-  
-    if (!this.consume(TokenType.COLON, vformat('(Expected ":"%s after "this.match" %s.)", has_guard ? "" : R"( or "when")", has_guard ? "pattern guard" : "patterns'))) {
-      
+
+    if (!this.consume(TokenType.COLON, vformat('(Expected ":"%s after "this.match" %s.)', has_guard ? "" : '( or "when")', has_guard ? "pattern guard" : "patterns"))) {
       return null;
     }
-  
+
     const suite: SuiteNode = new SuiteNode();
     if (branch.patterns.length > 0) {
-      [...branch.patterns[0].binds.entries()].map(([key,value])=>({key,value})).forEach(E => {
+      [...branch.patterns[0].binds.entries()].map(([key, value]) => ({ key, value })).forEach(E => {
         const local = new SuiteNode_Local(E.value, this.current_function);
         local.type = SuiteNode_Local_Type.PATTERN_BIND;
         suite.add_local(local);
       })
     }
-  
+
     branch.block = this.parse_suite("this.match pattern block", suite);
     return branch;
   }
-  parse_match_pattern(p_root_pattern: PatternNode): PatternNode | null {
+  parse_match_pattern(p_root_pattern: PatternNode|null = null): PatternNode | null {
     const pattern: PatternNode = new PatternNode();
-  
+
     switch (this.current.type) {
       case TokenType.VAR: {
         // Bind.
         this.advance();
         if (!this.consume(TokenType.IDENTIFIER, '(Expected bind name after "var".)')) {
-          
+
           return null;
         }
         pattern.pattern_type = PatternNode_Type.PT_BIND;
         const bind = pattern.value = this.parse_identifier();
-  
+
         const root_pattern: PatternNode = p_root_pattern == null ? pattern : p_root_pattern;
-  
+
         if (p_root_pattern != null) {
           if (p_root_pattern.has_bind(bind.name)) {
             push_error(vformat('(Bind variable name "%s" was already used in this pattern.)', bind.name));
-            
+
             return null;
           }
         }
-  
+
         if (this.current_suite!.has_local(bind.name)) {
           push_error(vformat('(There\'s already a %s named "%s" in this scope.)', this.current_suite!.get_local(bind.name).get_name(), bind.name));
-          
+
           return null;
         }
-  
+
         root_pattern.binds.set(bind.name, bind);
-  
+
       } break;
       case TokenType.UNDERSCORE:
         // Wildcard.
@@ -1702,7 +1713,7 @@ export class BinaryParser {
               push_error('(The ".." pattern must be the last element in the pattern dictionary.)');
             } else {
               const sub_pattern: PatternNode = new PatternNode();
-              
+
               sub_pattern.pattern_type = PatternNode_Type.PT_REST;
               pattern.dictionary.push({ key: null, value_pattern: sub_pattern });
               pattern.rest_used = true;
@@ -1740,7 +1751,7 @@ export class BinaryParser {
         const expression: ExpressionNode | null = this.parse_expression(false);
         if (expression == null) {
           push_error('(Expected expression for this.match pattern.)');
-          
+
           return null;
         } else {
           if (expression.type == Type.LITERAL) {
@@ -1757,35 +1768,35 @@ export class BinaryParser {
   }
   parse_while(): WhileNode {
     const n_while: WhileNode = new WhileNode();
-  
+
     n_while.condition = this.parse_expression(false);
     if (n_while.condition == null) {
       push_error('(Expected conditional expression after "while".)');
     }
-  
+
     this.consume(TokenType.COLON, '(Expected ":" after "while" condition.)');
-  
+
     // Save break/continue state.
     let could_break: boolean = this.can_break;
     let could_continue: boolean = this.can_continue;
-  
+
     // Allow break/continue.
     this.can_break = true;
     this.can_continue = true;
-  
+
     const suite: SuiteNode = new SuiteNode();
     suite.is_in_loop = true;
     n_while.loop = this.parse_suite('("while" block)', suite);
     // Reset break/continue state.
     this.can_break = could_break;
     this.can_continue = could_continue;
-  
+
     return n_while;
   }
 
 
   parse_precedence(p_precedence: Precedence, p_can_assign: boolean, p_stop_on_assign: boolean = false): ExpressionNode | null {
-    
+
     switch (this.current.type) {
       case TokenType.PARENTHESIS_OPEN:
       case TokenType.BRACE_OPEN:
@@ -1810,7 +1821,7 @@ export class BinaryParser {
     }
 
     let previous_operand = prefix_rule(null, p_can_assign);
-    while (p_precedence <= get_rule(this,this.current.type).precedence) {
+    while (p_precedence <= get_rule(this, this.current.type).precedence) {
       if (previous_operand == null || (p_stop_on_assign && this.current.type == TokenType.EQUAL) || this.lambda_ended) {
         return previous_operand;
       }
@@ -1824,7 +1835,7 @@ export class BinaryParser {
           break; // Nothing to do.
       }
       token = this.advance();
-      const infix_rule = get_rule(this,token.type).infix;
+      const infix_rule = get_rule(this, token.type).infix;
       if (infix_rule == null) {
         throw new Error();
       }
@@ -1888,26 +1899,26 @@ export class BinaryParser {
 
     return identifier;
   }
-  parse_literal(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_literal(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     if (this.previous.type != TokenType.LITERAL) {
       push_error("Parser bug: parsing literal node without literal token.");
     }
-  
+
     const literal: LiteralNode = new LiteralNode();
     literal.value = this.previous.literal!;
-    
+
     return literal;
   }
-  parse_self(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_self(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     if (this.current_function && this.current_function.is_static) {
       push_error('(Cannot use "self" inside a static function.)');
     }
     const _self: SelfNode = new SelfNode();
-    
+
     _self.current_class = this.current_class;
     return _self;
   }
-  parse_builtin_constant(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_builtin_constant(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const op_type = this.previous.type;
     const constant: LiteralNode = new LiteralNode();
     const num_Constant: Constant = { type: 4, type_s: 'FLOAT', val: 0 }
@@ -1931,13 +1942,13 @@ export class BinaryParser {
       default:
         return null; // Unreachable.
     }
-  
+
     return constant;
   }
-  parse_unary_operator(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_unary_operator(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const op_type = this.previous.type;
     const operation: UnaryOpNode = new UnaryOpNode();
-  
+
     switch (op_type) {
       case TokenType.MINUS:
         operation.operation = UnaryOpNode_OpType.OP_NEGATIVE;
@@ -1973,12 +1984,12 @@ export class BinaryParser {
         }
         break;
       default:
-        
+
         return null; // Unreachable.
     }
     return operation;
   }
-  parse_binary_not_in_operator(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_binary_not_in_operator(p_previous_operand: ExpressionNode | null, p_can_assign: boolean): ExpressionNode | null {
     // this.check that NOT is followed by IN by consuming it before calling this.parse_binary_operator which will only receive a plain IN
     const operation: UnaryOpNode = new UnaryOpNode();
 
@@ -1987,20 +1998,20 @@ export class BinaryParser {
     operation.operation = UnaryOpNode_OpType.OP_LOGIC_NOT;
     operation.variant_op = VariantOperator.OP_NOT;
     operation.operand = in_operation;
-    
+
     return operation;
   }
-  parse_binary_operator(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_binary_operator(p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const op = this.previous!;
     const operation: BinaryOpNode = new BinaryOpNode();
-  
+
     const precedence = get_rule(this, op.type).precedence + 1;
     operation.left_operand = p_previous_operand;
     operation.right_operand = this.parse_precedence(precedence, false);
     if (operation.right_operand == null) {
       push_error(vformat('(Expected expression after "%s" operator.)', op.type));
     }
-  
+
     // TODO: Also for unary, ternary, and assignment.
     switch (op.type) {
       case TokenType.PLUS:
@@ -2088,30 +2099,30 @@ export class BinaryParser {
       default:
         return null; // Unreachable.
     }
-  
+
     return operation;
   }
-  parse_ternary_operator(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode {
+  parse_ternary_operator(p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode {
     // Only one ternary operation exists, so no abstraction here.
     const operation: TernaryOpNode = new TernaryOpNode();
-  
+
     operation.true_expr = p_previous_operand;
     operation.condition = this.parse_precedence(Precedence.PREC_TERNARY, false);
-  
+
     if (operation.condition == null) {
       push_error('(Expected expression as ternary condition after "if".)');
     }
-  
+
     this.consume(TokenType.ELSE, '(Expected "else" after ternary operator condition.)');
-  
+
     operation.false_expr = this.parse_precedence(Precedence.PREC_TERNARY, false);
-  
+
     if (operation.false_expr == null) {
       push_error('(Expected expression after "else".)');
     }
     return operation;
   }
-  parse_assignment(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_assignment(p_previous_operand: ExpressionNode | null, p_can_assign: boolean): ExpressionNode | null {
     if (!p_can_assign) {
       push_error("Assignment is not allowed inside an expression.");
       return this.parse_expression(false); // Return the following expression.
@@ -2119,7 +2130,7 @@ export class BinaryParser {
     if (p_previous_operand == null) {
       return this.parse_expression(false); // Return the following expression.
     }
-  
+
     switch (p_previous_operand.type) {
       case Type.IDENTIFIER: {
       } break;
@@ -2130,7 +2141,7 @@ export class BinaryParser {
         push_error('(Only identifier, attribute access, and subscription access can be used as assignment target.)');
         return this.parse_expression(false); // Return the following expression.
     }
-  
+
     const assignment: AssignmentNode = new AssignmentNode();
     switch (this.previous!.type) {
       case TokenType.EQUAL:
@@ -2191,7 +2202,7 @@ export class BinaryParser {
     }
     return assignment;
   }
-  parse_await(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_await(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const _await: AwaitNode = new AwaitNode();
     const element: ExpressionNode | null = this.parse_precedence(Precedence.PREC_AWAIT, false);
     if (element == null) {
@@ -2201,19 +2212,19 @@ export class BinaryParser {
     if (this.current_function) { // Might be null in a getter or setter.
       this.current_function.is_coroutine = true;
     }
-  
+
     return _await;
   }
-  parse_array(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_array(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const array: ArrayNode = new ArrayNode();
-  
+
     if (!this.check(TokenType.BRACKET_CLOSE)) {
       do {
         if (this.check(TokenType.BRACKET_CLOSE)) {
           // Allow for trailing comma.
           break;
         }
-  
+
         const element: ExpressionNode | null = this.parse_expression(false);
         if (element == null) {
           push_error('(Expected expression as array element.)');
@@ -2226,9 +2237,9 @@ export class BinaryParser {
     this.consume(TokenType.BRACKET_CLOSE, '(Expected closing "]" after array elements.)');
     return array;
   }
-  parse_dictionary(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_dictionary(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const dictionary: DictionaryNode = new DictionaryNode();
-  
+
     let decided_style: boolean = false;
     if (!this.check(TokenType.BRACE_CLOSE)) {
       do {
@@ -2236,14 +2247,14 @@ export class BinaryParser {
           // Allow for trailing comma.
           break;
         }
-  
+
         // Key.
         const key: ExpressionNode | null = this.parse_expression(false, true); // Stop on "=" so we can this.check for Lua table style.
-  
+
         if (key == null) {
           push_error('(Expected expression as dictionary key.)');
         }
-  
+
         if (!decided_style) {
           switch (this.current.type) {
             case TokenType.COLON:
@@ -2258,7 +2269,7 @@ export class BinaryParser {
           }
           decided_style = true;
         }
-  
+
         switch (dictionary.style) {
           case DictionaryNode_Style.LUA_TABLE:
             if (key != null && key.type != Type.IDENTIFIER && key.type != Type.LITERAL) {
@@ -2266,7 +2277,7 @@ export class BinaryParser {
               this.advance();
               break;
             }
-            if (key != null && key.type == Type.LITERAL && ((key as LiteralNode).value! as Constant ).type_s != 'STRING') {
+            if (key != null && key.type == Type.LITERAL && ((key as LiteralNode).value! as Constant).type_s != 'STRING') {
               push_error('(Expected identifier or string as Lua-style dictionary key (e.g "{ key = value }").)');
               this.advance();
               break;
@@ -2299,13 +2310,13 @@ export class BinaryParser {
             }
             break;
         }
-  
+
         // Value.
         const value: ExpressionNode | null = this.parse_expression(false);
         if (value == null) {
           push_error('(Expected expression as dictionary value.)');
         }
-  
+
         if (key != null && value != null) {
           dictionary.elements.push({ key, value });
         }
@@ -2315,7 +2326,7 @@ export class BinaryParser {
     this.consume(TokenType.BRACE_CLOSE, '(Expected closing "}" after dictionary elements.)');
     return dictionary;
   }
-  parse_grouping(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_grouping(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const grouped: ExpressionNode | null = this.parse_expression(false);
     this.pop_multiline();
     if (grouped == null) {
@@ -2325,22 +2336,22 @@ export class BinaryParser {
     }
     return grouped;
   }
-  parse_attribute(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_attribute(p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const attribute: SubscriptNode = new SubscriptNode();
     attribute.base = p_previous_operand;
     if (is_node_name(this.current.type)) {
       this.current.type = TokenType.IDENTIFIER;
     }
     if (!this.consume(TokenType.IDENTIFIER, '(Expected identifier after "." for attribute access.)')) {
-      
+
       return attribute;
     }
-  
+
     attribute.is_attribute = true;
     attribute.attribute = this.parse_identifier();
     return attribute;
   }
-  parse_subscript(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_subscript(p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const subscript: SubscriptNode = new SubscriptNode();
     subscript.base = p_previous_operand;
     subscript.index = this.parse_expression(false);
@@ -2351,110 +2362,110 @@ export class BinaryParser {
     this.consume(TokenType.BRACKET_CLOSE, '(Expected "]" after subscription index.)');
     return subscript;
   }
-  parse_cast(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_cast(p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     const cast: CastNode = new CastNode();
-  
+
     cast.operand = p_previous_operand;
     cast.cast_type = this.parse_type();
     if (cast.cast_type == null) {
       push_error('(Expected type specifier after "as".)');
       return p_previous_operand;
     }
-  
+
     return cast;
   }
-  parse_call(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
-     const call: CallNode = new CallNode();
-   
-     if (this.previous.type == TokenType.SUPER) {
-       // Super call.
-       call.is_super = true;
-       this.push_multiline(true);
-       if (this.match(TokenType.PARENTHESIS_OPEN)) {
-         // Implicit call to the parent method of the same name.
-         if (this.current_function == null) {
-           push_error('(Cannot use implicit "super" call outside of a function.)');
-           this.pop_multiline();
-           
-           return null;
-         }
-         if (this.current_function.identifier) {
-           call.function_name = this.current_function.identifier.name;
-         } else {
-           call.function_name = ("<anonymous>");
-         }
-       } else {
-         this.consume(TokenType.PERIOD, '(Expected "." or "(" after "super".)');
-         
-         if (!this.consume(TokenType.IDENTIFIER, '(Expected function name after ".".)')) {
-           this.pop_multiline();
-           
-           return null;
-         }
-         const identifier: IdentifierNode = this.parse_identifier();
-         call.callee = identifier;
-         call.function_name = identifier.name;
-         this.consume(TokenType.PARENTHESIS_OPEN, '(Expected "(" after function name.)');
-       }
-     } else {
-       call.callee = p_previous_operand;
-   
-       if (call.callee == null) {
-         push_error('*(Cannot call on an expression. Use ".call()" if it\'s a Callable.)*');
-       } else if (call.callee.type == Type.IDENTIFIER) {
-         call.function_name = (call.callee as IdentifierNode).name;
-         
-       } else if (call.callee.type == Type.SUBSCRIPT) {
-         const attribute: SubscriptNode = (call.callee as SubscriptNode);
-         if (attribute.is_attribute) {
-           if (attribute.attribute) {
-             call.function_name = attribute.attribute.name;
-           }
-           
-         } else {
-           // TODO: The analyzer can see if this is actually a Callable and give better error message.
-           push_error('*(Cannot call on an expression. Use ".call()" if it\'s a Callable.)*');
-         }
-       } else {
-         push_error('*(Cannot call on an expression. Use ".call()" if it\'s a Callable.)*');
-       }
-     }
-   
-     // Arguments.
- 
-     do {
-             if (this.check(TokenType.PARENTHESIS_CLOSE)) {
-         // Allow for trailing comma.
-         break;
-       }
-       const argument: ExpressionNode | null = this.parse_expression(false);
-       if (argument == null) {
-         push_error('(Expected expression as the function argument.)');
-       } else {
-         call.arguments.push(argument);
-         }
-   
-     } while (this.match(TokenType.COMMA));
-     this.pop_multiline();
-     this.consume(TokenType.PARENTHESIS_CLOSE, '*(Expected closing ")" after call arguments.)*');
-     return call;
+  parse_call(p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
+    const call: CallNode = new CallNode();
+
+    if (this.previous.type == TokenType.SUPER) {
+      // Super call.
+      call.is_super = true;
+      this.push_multiline(true);
+      if (this.match(TokenType.PARENTHESIS_OPEN)) {
+        // Implicit call to the parent method of the same name.
+        if (this.current_function == null) {
+          push_error('(Cannot use implicit "super" call outside of a function.)');
+          this.pop_multiline();
+
+          return null;
+        }
+        if (this.current_function.identifier) {
+          call.function_name = this.current_function.identifier.name;
+        } else {
+          call.function_name = ("<anonymous>");
+        }
+      } else {
+        this.consume(TokenType.PERIOD, '(Expected "." or "(" after "super".)');
+
+        if (!this.consume(TokenType.IDENTIFIER, '(Expected function name after ".".)')) {
+          this.pop_multiline();
+
+          return null;
+        }
+        const identifier: IdentifierNode = this.parse_identifier();
+        call.callee = identifier;
+        call.function_name = identifier.name;
+        this.consume(TokenType.PARENTHESIS_OPEN, '(Expected "(" after function name.)');
+      }
+    } else {
+      call.callee = p_previous_operand;
+
+      if (call.callee == null) {
+        push_error('*(Cannot call on an expression. Use ".call()" if it\'s a Callable.)*');
+      } else if (call.callee.type == Type.IDENTIFIER) {
+        call.function_name = (call.callee as IdentifierNode).name;
+
+      } else if (call.callee.type == Type.SUBSCRIPT) {
+        const attribute: SubscriptNode = (call.callee as SubscriptNode);
+        if (attribute.is_attribute) {
+          if (attribute.attribute) {
+            call.function_name = attribute.attribute.name;
+          }
+
+        } else {
+          // TODO: The analyzer can see if this is actually a Callable and give better error message.
+          push_error('*(Cannot call on an expression. Use ".call()" if it\'s a Callable.)*');
+        }
+      } else {
+        push_error('*(Cannot call on an expression. Use ".call()" if it\'s a Callable.)*');
+      }
+    }
+
+    // Arguments.
+
+    do {
+      if (this.check(TokenType.PARENTHESIS_CLOSE)) {
+        // Allow for trailing comma.
+        break;
+      }
+      const argument: ExpressionNode | null = this.parse_expression(false);
+      if (argument == null) {
+        push_error('(Expected expression as the function argument.)');
+      } else {
+        call.arguments.push(argument);
+      }
+
+    } while (this.match(TokenType.COMMA));
+    this.pop_multiline();
+    this.consume(TokenType.PARENTHESIS_CLOSE, '*(Expected closing ")" after call arguments.)*');
+    return call;
   }
-  parse_get_node(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
+  parse_get_node(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
     // We want code completion after a DOLLAR even if the this.current code is invalid.
     if (!is_node_name(this.current.type) && !this.check(TokenType.LITERAL) && !this.check(TokenType.SLASH) && !this.check(TokenType.PERCENT)) {
       push_error(vformat('(Expected node path as string or identifier after "%s".)', this.previous.type));
       return null;
     }
-  
+
     if (this.check(TokenType.LITERAL)) {
       if ((this.current.literal as Constant).type_s != 'STRING') {
         push_error(vformat('(Expected node path as string or identifier after "%s".)', this.previous.type));
         return null;
       }
     }
-  
+
     const get_node: GetNodeNode = new GetNodeNode();
-  
+
     // Store the last item in the path so the parser knows what to expect.
     // Allow allows more specific error messages.
     enum PathState {
@@ -2464,36 +2475,34 @@ export class BinaryParser {
       PATH_STATE_NODE_NAME,
     };
     let path_state: PathState = PathState.PATH_STATE_START;
-  
+
     if (this.previous.type == TokenType.DOLLAR) {
       // Detect initial slash, which will be handled in the loop if it matches.
       this.match(TokenType.SLASH);
     } else {
       get_node.use_dollar = false;
     }
-  
-    let context_argument = 0;
-  
+
     do {
       if (this.previous.type == TokenType.PERCENT) {
         if (path_state != PathState.PATH_STATE_START && path_state != PathState.PATH_STATE_SLASH) {
           push_error('("%" is only valid in the beginning of a node name (either after "$" or after "/"))');
-          
+
           return null;
         }
-  
+
         get_node.full_path += "%";
-  
+
         path_state = PathState.PATH_STATE_PERCENT;
       } else if (this.previous.type == TokenType.SLASH) {
         if (path_state != PathState.PATH_STATE_START && path_state != PathState.PATH_STATE_NODE_NAME) {
           push_error('("/" is only valid at the beginning of the path or after a node name.)');
-          
+
           return null;
         }
-  
+
         get_node.full_path += "/";
-  
+
         path_state = PathState.PATH_STATE_SLASH;
       }
       if (this.match(TokenType.LITERAL)) {
@@ -2513,186 +2522,186 @@ export class BinaryParser {
               break;
           }
           push_error(vformat('(Expected node path as string or identifier after "%s".)', previous_token));
-          
+
           return null;
         }
-  
+
         get_node.full_path += (this.previous.literal as Constant).val;
-  
+
         path_state = PathState.PATH_STATE_NODE_NAME;
       } else if (is_node_name(this.current.type)) {
         this.advance();
-        
+
         const identifier = get_identifier(this.previous);
         get_node.full_path += identifier;
-  
+
         path_state = PathState.PATH_STATE_NODE_NAME;
       } else if (!this.check(TokenType.SLASH) && !this.check(TokenType.PERCENT)) {
-        push_error(vformat('(Unexpected "%s" in node path.)', this.current.get_name()));
-        
+        push_error(vformat('(Unexpected "%s" in node path.)', this.current.type));
+
         return null;
       }
     } while (this.match(TokenType.SLASH) || this.match(TokenType.PERCENT));
     return get_node;
   }
-  
-parse_preload(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
-	const preload: PreloadNode  = new PreloadNode();
-	preload.resolved_path = "<missing path>";
 
-	this.push_multiline(true);
-	this.consume(TokenType.PARENTHESIS_OPEN, '(Expected "(" after "preload".)');
+  parse_preload(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
+    const preload: PreloadNode = new PreloadNode();
+    preload.resolved_path = "<missing path>";
 
-	preload.path = this.parse_expression(false);
+    this.push_multiline(true);
+    this.consume(TokenType.PARENTHESIS_OPEN, '(Expected "(" after "preload".)');
 
-	if (preload.path == null) {
-		push_error('(Expected resource path after "(".)');
-	}
+    preload.path = this.parse_expression(false);
 
-	this.pop_multiline();
-	this.consume(TokenType.PARENTHESIS_CLOSE, '*(Expected ")" after preload path.)*');
+    if (preload.path == null) {
+      push_error('(Expected resource path after "(".)');
+    }
 
-	return preload;
-}
+    this.pop_multiline();
+    this.consume(TokenType.PARENTHESIS_CLOSE, '*(Expected ")" after preload path.)*');
 
-parse_lambda(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
-	const lambda: LambdaNode = new LambdaNode();
-	lambda.parent_function = this.current_function;
-	lambda.parent_lambda = this.current_lambda;
+    return preload;
+  }
 
-	const _function = new FunctionNode();
-	_function.source_lambda = lambda;
+  parse_lambda(_p_previous_operand: ExpressionNode, _p_can_assign: boolean): ExpressionNode | null {
+    const lambda: LambdaNode = new LambdaNode();
+    lambda.parent_function = this.current_function;
+    lambda.parent_lambda = this.current_lambda;
 
-	_function.is_static = this.current_function != null ? this.current_function.is_static : false;
+    const _function = new FunctionNode();
+    _function.source_lambda = lambda;
 
-	if (this.match(TokenType.IDENTIFIER)) {
-		_function.identifier = this.parse_identifier();
-	}
+    _function.is_static = this.current_function != null ? this.current_function.is_static : false;
 
-	let multiline_context = this.multiline_stack.slice(-1)[0];
+    if (this.match(TokenType.IDENTIFIER)) {
+      _function.identifier = this.parse_identifier();
+    }
 
-	// Reset the multiline stack since we don't want the multiline mode one in the lambda body.
-	this.push_multiline(false);
-	if (multiline_context) {
-		//tokenizer.push_expression_indented_block();
-	}
+    let multiline_context = this.multiline_stack.slice(-1)[0];
 
-	this.push_multiline(true); // For the parameters.
-	if (_function.identifier) {
-		this.consume(TokenType.PARENTHESIS_OPEN, '(Expected opening "(" after lambda name.)');
-	} else {
-		this.consume(TokenType.PARENTHESIS_OPEN, '(Expected opening "(" after "func".)');
-	}
+    // Reset the multiline stack since we don't want the multiline mode one in the lambda body.
+    this.push_multiline(false);
+    if (multiline_context) {
+      //tokenizer.push_expression_indented_block();
+    }
 
-	const previous_function = this.current_function;
-	this.current_function = _function;
+    this.push_multiline(true); // For the parameters.
+    if (_function.identifier) {
+      this.consume(TokenType.PARENTHESIS_OPEN, '(Expected opening "(" after lambda name.)');
+    } else {
+      this.consume(TokenType.PARENTHESIS_OPEN, '(Expected opening "(" after "func".)');
+    }
 
-	const previous_lambda = this.current_lambda;
-	this.current_lambda = lambda;
+    const previous_function = this.current_function;
+    this.current_function = _function;
 
-	const body: SuiteNode = new SuiteNode();
-	body.parent_function = this.current_function;
-	body.parent_block = this.current_suite;
+    const previous_lambda = this.current_lambda;
+    this.current_lambda = lambda;
 
-	const previous_suite = this.current_suite;
-	this.current_suite = body;
+    const body: SuiteNode = new SuiteNode();
+    body.parent_function = this.current_function;
+    body.parent_block = this.current_suite;
 
-	this.parse_function_signature(_function, body, "lambda");
+    const previous_suite = this.current_suite;
+    this.current_suite = body;
 
-	this.current_suite = previous_suite;
+    this.parse_function_signature(_function, body, "lambda");
 
-	let previous_in_lambda = this.in_lambda;
-	this.in_lambda = true;
+    this.current_suite = previous_suite;
 
-	// Save break/continue state.
-	let could_break = this.can_break;
-	let could_continue = this.can_continue;
+    let previous_in_lambda = this.in_lambda;
+    this.in_lambda = true;
 
-	// Disallow break/continue.
-	this.can_break = false;
-	this.can_continue = false;
+    // Save break/continue state.
+    let could_break = this.can_break;
+    let could_continue = this.can_continue;
 
-	_function.body = this.parse_suite("lambda declaration", body, true);
-	
-	this.pop_multiline();
+    // Disallow break/continue.
+    this.can_break = false;
+    this.can_continue = false;
 
-	if (multiline_context) {
-		// If we're in multiline mode, we want to skip the spurious DEDENT and NEWLINE tokens.
-		while (this.check(TokenType.DEDENT) || this.check(TokenType.INDENT) || this.check(TokenType.NEWLINE)) {
-			this.index++; // Not advance() since we don't want to change the previous token.
-		}
-		//tokenizer.pop_expression_indented_block();
-	}
+    _function.body = this.parse_suite("lambda declaration", body, true);
 
-	this.current_function = previous_function;
-	this.current_lambda = previous_lambda;
-	this.in_lambda = previous_in_lambda;
-	lambda.function = _function;
+    this.pop_multiline();
 
-	// Reset break/continue state.
-	this.can_break = could_break;
-	this.can_continue = could_continue;
+    if (multiline_context) {
+      // If we're in multiline mode, we want to skip the spurious DEDENT and NEWLINE tokens.
+      while (this.check(TokenType.DEDENT) || this.check(TokenType.INDENT) || this.check(TokenType.NEWLINE)) {
+        this.index++; // Not advance() since we don't want to change the previous token.
+      }
+      //tokenizer.pop_expression_indented_block();
+    }
 
-	return lambda;
-}
+    this.current_function = previous_function;
+    this.current_lambda = previous_lambda;
+    this.in_lambda = previous_in_lambda;
+    lambda.function = _function;
 
-parse_type_test(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
-	// x is not int
-	// ^        ^^^ ExpressionNode, TypeNode
-	// ^^^^^^^^^^^^ TypeTestNode
-	// ^^^^^^^^^^^^ UnaryOpNode
-	let not_node: UnaryOpNode | null = null;
-	if (this.match(TokenType.NOT)) {
-		not_node = new UnaryOpNode();
-		not_node.operation = UnaryOpNode_OpType.OP_LOGIC_NOT;
-		not_node.variant_op = VariantOperator.OP_NOT;
-	}
+    // Reset break/continue state.
+    this.can_break = could_break;
+    this.can_continue = could_continue;
 
-	const type_test: TypeTestNode = new TypeTestNode();
+    return lambda;
+  }
 
-	type_test.operand = p_previous_operand;
-	type_test.test_type = this.parse_type();
+  parse_type_test(p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
+    // x is not int
+    // ^        ^^^ ExpressionNode, TypeNode
+    // ^^^^^^^^^^^^ TypeTestNode
+    // ^^^^^^^^^^^^ UnaryOpNode
+    let not_node: UnaryOpNode | null = null;
+    if (this.match(TokenType.NOT)) {
+      not_node = new UnaryOpNode();
+      not_node.operation = UnaryOpNode_OpType.OP_LOGIC_NOT;
+      not_node.variant_op = VariantOperator.OP_NOT;
+    }
 
-	if (not_node != null) {
-		not_node.operand = type_test;
-	}
+    const type_test: TypeTestNode = new TypeTestNode();
 
-	if (type_test.test_type == null) {
-		if (not_node == null) {
-			push_error('(Expected type specifier after "is".)');
-		} else {
-			push_error('(Expected type specifier after "is not".)');
-		}
-	}
+    type_test.operand = p_previous_operand;
+    type_test.test_type = this.parse_type();
 
-	if (not_node != null) {
-		return not_node;
-	}
+    if (not_node != null) {
+      not_node.operand = type_test;
+    }
 
-	return type_test;
-}
+    if (type_test.test_type == null) {
+      if (not_node == null) {
+        push_error('(Expected type specifier after "is".)');
+      } else {
+        push_error('(Expected type specifier after "is not".)');
+      }
+    }
 
-parse_yield(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null{
-	push_error('("yield" was removed in Godot 4. Use "await" instead.)');
-	return null;
-}
+    if (not_node != null) {
+      return not_node;
+    }
 
-parse_invalid_token(p_previous_operand: ExpressionNode, p_can_assign: boolean): ExpressionNode | null {
-	// Just for better error messages.
-	const invalid= this.previous.type;
+    return type_test;
+  }
 
-	switch (invalid) {
-		case TokenType.QUESTION_MARK:
-			push_error('(Unexpected "?" in source. If you want a ternary operator, use "truthy_value if true_condition else falsy_value".)');
-			break;
-		default:
-			return null; // Unreachable.
-	}
+  parse_yield(_p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
+    push_error('("yield" was removed in Godot 4. Use "await" instead.)');
+    return null;
+  }
 
-	// Return the previous expression.
-	return p_previous_operand;
-}
-  
+  parse_invalid_token(p_previous_operand: ExpressionNode | null, _p_can_assign: boolean): ExpressionNode | null {
+    // Just for better error messages.
+    const invalid = this.previous.type;
+
+    switch (invalid) {
+      case TokenType.QUESTION_MARK:
+        push_error('(Unexpected "?" in source. If you want a ternary operator, use "truthy_value if true_condition else falsy_value".)');
+        break;
+      default:
+        return null; // Unreachable.
+    }
+
+    // Return the previous expression.
+    return p_previous_operand;
+  }
+
   parse_type(p_allow_void: boolean = false): TypeNode | null {
     let type: TypeNode | null = new TypeNode();
 

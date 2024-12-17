@@ -1,6 +1,5 @@
 import { Constant } from "../../parse/binary/gdc";
-import { Nil, VariantType } from "../../parse/binary/variant";
-import { BIN } from "../../parse/binary/variant_binary";
+import { VariantType } from "../../parse/binary/variant";
 import { BinaryParser } from "./parser";
 
 export const enum PropertyUsageFlags {
@@ -357,7 +356,7 @@ export class ClassNode extends Node {
   annotated_static_unload = false;
   extends_path = "";
   extends: IdentifierNode[] = []; // List for indexing: extends A.B.C
-  base_type: DataType | null = null;
+  //base_type: DataType | null = null;
   fqcn = "";
   resolved_interface = false;
   resolved_body = false;
@@ -607,7 +606,7 @@ export class TypeNode extends Node {
 export class TypeTestNode extends ExpressionNode {
   operand: ExpressionNode | null = null;
   test_type: TypeNode | null = null;
-  test_datatype: DataType = {};
+  //test_datatype: DataType = {};
 
   type = Type.TYPE_TEST;
 };

@@ -2,7 +2,7 @@ import { TokenType } from "../../parse/binary/gdc_tokens";
 import { BinaryParser } from "./parser";
 import { ExpressionNode } from "./type";
 
-export 	enum Precedence {
+export const	enum Precedence {
   PREC_NONE,
   PREC_ASSIGNMENT,
   PREC_CAST,

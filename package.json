@@ -7,13 +7,17 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "webpack": "webpack",
     "parser": "peggy -o ./src/godot-scene-reader/parse/text/resource/parser.js --format es ./src/godot-scene-reader/parse/text/resource/parser.peggy"
   },
   "devDependencies": {
     "@types/pako": "2.0.3",
     "peggy": "4.0.3",
+    "ts-loader": "9.5.1",
     "typescript": "^5.5.3",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "webpack": "5.97.1",
+    "webpack-cli": "5.1.4"
   },
   "dependencies": {
     "fzstd": "0.1.1",

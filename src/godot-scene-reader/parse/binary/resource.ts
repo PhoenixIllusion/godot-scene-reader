@@ -68,6 +68,7 @@ export async function try_open_bin_resource(res_path: string, arrayBuffer: Array
   }
 
   const big_endian = !!dataView.getUint32(read_offset);read_offset+=4;
+  // @ts-ignore
   const use_real64 =
    !!dataView.getUint32(read_offset);read_offset+=4;
 
@@ -93,6 +94,7 @@ export async function try_open_bin_resource(res_path: string, arrayBuffer: Array
 	}
 
   const type = get_ustring();
+  // @ts-ignore
   const importmd_ofs = f.get_64bi();
   const flags = f.get_32();
 
