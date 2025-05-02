@@ -8,7 +8,7 @@ const input = document.getElementById('file-input') as HTMLInputElement;
 const out = document.getElementById('app') as HTMLDivElement;
 input.onchange = parseFile;
 
-function parseFile(this: GlobalEventHandlers, ev: Event) {
+function parseFile(this: GlobalEventHandlers, _ev: Event) {
   const $this = this as HTMLInputElement;
   const file = $this.files?.item(0);
   if(file) {
