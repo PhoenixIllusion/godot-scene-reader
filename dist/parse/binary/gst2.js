@@ -1,0 +1,106 @@
+import { DataReader, decoder } from "../../util/data-reader";
+import { DataFormat, get_format_block_size, get_format_pixel_rshift, get_format_pixel_size } from "./gst2_format";
+import { GodotReader } from "./util/reader";
+function load_image(f, data_format, w, h, mipmaps, format, p_size_limit) {
+    let sw = w;
+    let sh = h;
+    //mipmaps need to be read independently, they will be later combined
+    const mipmap_images = [];
+    for (let i = 0; i < mipmaps + 1; i++) {
+        const size = f.get_32();
+        if (p_size_limit > 0 && i < (mipmaps - 1) && (sw > p_size_limit || sh > p_size_limit)) {
+            //can't load this due to size limit
+            sw = Math.max(sw >> 1, 1);
+            sh = Math.max(sh >> 1, 1);
+            f.seek(f.get_position() + size);
+            continue;
+        }
+        const pv = f.get_buffer(size);
+        if (pv.length == 0) {
+            throw new Error("Image Null or Empty");
+        }
+        mipmap_images.push({
+            width: sw, height: sh, mipmap_level: i,
+            data_format: data_format,
+            image_format: format,
+            buffer: pv
+        });
+        sw = Math.max(sw >> 1, 1);
+        sh = Math.max(sh >> 1, 1);
+    }
+    return mipmap_images;
+}
+function data_image(f, w, h, mipmaps, format) {
+    const mipmap_images = [];
+    const pixsize = get_format_pixel_size(format);
+    const pixshift = get_format_pixel_rshift(format);
+    const block = get_format_block_size(format);
+    const minw = 1, minh = 1;
+    for (let i = 0; i < mipmaps + 1; i++) {
+        const bw = w % block != 0 ? w + (block - w % block) : w;
+        const bh = h % block != 0 ? h + (block - h % block) : h;
+        let size = bw * bh;
+        size *= pixsize;
+        size >>= pixshift;
+        const pv = f.get_buffer(size);
+        mipmap_images.push({
+            width: w, height: h, mipmap_level: i,
+            data_format: DataFormat.DATA_FORMAT_IMAGE,
+            image_format: format,
+            buffer: pv
+        });
+        if (w == minw && h == minh) {
+            break;
+        }
+        w = Math.max(minw, w >> 1);
+        h = Math.max(minh, h >> 1);
+        if (pv.length == 0) {
+            throw new Error("Image Null or Empty");
+        }
+    }
+    return mipmap_images;
+}
+export function try_open_ctex(arrayBuffer) {
+    let dataView = new DataView(arrayBuffer);
+    const header = decoder.decode(new Uint8Array(arrayBuffer.slice(0, 4)));
+    if (header !== 'GST2') {
+        throw new Error("Cannot Open File");
+    }
+    const f = new GodotReader(new DataReader(dataView, true), false);
+    f.skip(4);
+    const version = f.get_32();
+    const width = f.get_32();
+    const height = f.get_32();
+    const flags = f.get_32();
+    const mipmap_limit = f.get_32();
+    f.get_32();
+    f.get_32();
+    f.get_32(); //reserved 12 bytes
+    const data_format = f.get_32();
+    const w = f.get_16();
+    const h = f.get_16();
+    const mipmaps = f.get_32();
+    const format = f.get_32();
+    let images = [];
+    if (data_format == DataFormat.DATA_FORMAT_PNG || data_format == DataFormat.DATA_FORMAT_WEBP) {
+        if (data_format == DataFormat.DATA_FORMAT_PNG) {
+            images = load_image(f, data_format, w, h, mipmaps, format, 0);
+        }
+        else if (data_format == DataFormat.DATA_FORMAT_WEBP) {
+            images = load_image(f, data_format, w, h, mipmaps, format, 0);
+        }
+    }
+    else if (data_format == DataFormat.DATA_FORMAT_BASIS_UNIVERSAL) {
+        images = load_image(f, data_format, w, h, 0, format, 0);
+    }
+    else if (data_format == DataFormat.DATA_FORMAT_IMAGE) {
+        images = data_image(f, w, h, mipmaps, format);
+        if (f.get_position() != arrayBuffer.byteLength) {
+            throw new Error("Assertion Failed in Parsing Image Format");
+        }
+    }
+    return {
+        version, width, height, flags, mipmap_limit,
+        images
+    };
+}

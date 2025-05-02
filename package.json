@@ -1,26 +1,59 @@
 {
-  "name": "godot-scene-reader",
+  "name": "@phoenixillusion/godot-scene-reader",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "author": "Phoenix Illusion",
+	"license": "MIT",
+	"repository": "https://github.com/PhoenixIllusion/godot-scene-reader.git",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "webpack": "webpack",
-    "parser": "peggy -o ./src/godot-scene-reader/parse/text/resource/parser.js --format es ./src/godot-scene-reader/parse/text/resource/parser.peggy"
+    "prebuild": "sh clean-dist.sh",
+    "build": "tsc",
+    "postbuild": "sh copy-text-parser.sh",
+    "parser": "peggy -o ./src/parse/text/resource/parser.js --format es ./src/parse/text/resource/parser.peggy"
   },
   "devDependencies": {
-    "@types/pako": "2.0.3",
     "peggy": "4.0.3",
-    "ts-loader": "9.5.1",
-    "typescript": "^5.5.3",
-    "vite": "^5.4.1",
-    "webpack": "5.97.1",
-    "webpack-cli": "5.1.4"
+    "typescript": "^5.5.3"
   },
-  "dependencies": {
-    "fzstd": "0.1.1",
-    "pako": "2.1.0"
-  }
+  "peerDependencies": {
+    "fzstd": "0.1.1"
+  },
+  "optionalDependencies": {
+    "nanotar": "0.1.1"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./*.js": "./dist/*.js",
+    "./util": "./dist/util/index.js",
+    "./util/*.js": "./dist/util/*.js",
+    "./parse": "./dist/parse/index.js",
+    "./parse/*.js": "./dist/parse/*.js",
+    "./parse/binary": "./dist/parse/binary/index.js",
+    "./parse/binary/*.js": "./dist/parse/binary/*.js",
+    "./parse/binary/util": "./dist/parse/binary/util/index.js",
+    "./parse/binary/util/*.js": "./dist/parse/binary/util/*.js",
+    "./parse/text": "./dist/parse/text/index.js",
+    "./parse/text/*.js": "./dist/parse/text/*.js",
+    "./parse/text/remap": "./dist/parse/text/remap/index.js",
+    "./parse/text/remap/*.js": "./dist/parse/text/remap/*.js",
+    "./parse/text/resource": "./dist/parse/text/resource/index.js",
+    "./parse/text/resource/*.js": "./dist/parse/text/resource/*.js",
+    "./pck": "./dist/pck/index.js",
+    "./pck/*.js": "./dist/pck/*.js",
+    "./process": "./dist/process/index.js",
+    "./process/*.js": "./dist/process/*.js",
+    "./process/gdc": "./dist/process/gdc/index.js",
+    "./process/gdc/*.js": "./dist/process/gdc/*.js",
+    "./process/scene": "./dist/process/scene/index.js",
+    "./process/scene/*.js": "./dist/process/scene/*.js",
+    "./process/scene/mesh": "./dist/process/scene/mesh/index.js",
+    "./process/scene/mesh/*.js": "./dist/process/scene/mesh/*.js",
+    "./extras": "./dist/extras/index.js",
+    "./extras/*.js": "./dist/extras/*.js"
+  },
+  "files": [
+    "README.md",
+    "./dist/**"
+  ]
 }
