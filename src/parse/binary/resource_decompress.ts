@@ -12,8 +12,6 @@ const enum CompressionMode {
   MODE_BROTLI
 }
 
-
-
 async function get_decoder(c_mode: number): Promise<(buffer: Uint8Array) => Uint8Array> {
   switch (c_mode) {
     case CompressionMode.MODE_ZSTD: {

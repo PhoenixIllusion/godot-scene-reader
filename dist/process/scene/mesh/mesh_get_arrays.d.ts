@@ -8,5 +8,5 @@ type F2A = F2[];
 type F3A = F3[];
 type F4A = F4[];
 type FA = F1A | F2A | F3A | F4A;
-export declare function _get_array_from_surface(p_format: number, p_vertex_data: ArrayBuffer, p_attrib_data: ArrayBuffer | null, p_skin_data: ArrayBuffer | null, p_vertex_len: number, p_index_data: ArrayBuffer | null, p_index_len: number, p_aabb: AABB, p_uv_scale: Vector4): (Uint8Array[] | FA)[];
+export declare function _get_array_from_surface(p_format: number, p_vertex_data: ArrayBuffer, p_attrib_data: ArrayBuffer | null, p_skin_data: ArrayBuffer | null, p_vertex_len: number, p_index_data: ArrayBuffer | null, p_index_len: number, p_aabb: AABB, p_uv_scale: Vector4): (Uint8Array<ArrayBufferLike>[] | FA)[];
 export {};

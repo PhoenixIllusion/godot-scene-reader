@@ -2,6 +2,18 @@
 export const VERSION_MAJOR = 4;
 export const VERSION_MINOR = 4;
 
+export const enum LogLevel {
+  OFF,
+  ERROR,
+  WARN,
+  VERBOSE
+}
+
+let LOG_LEVEL = LogLevel.OFF;
+export function setLogLevel(level: LogLevel) {
+  LOG_LEVEL = level;
+}
+
 function bigIntToInt(bigInt: bigint): number {
   if (bigInt >= Number.MIN_SAFE_INTEGER && bigInt <= Number.MAX_SAFE_INTEGER) {
     return Number(bigInt);
@@ -21,7 +33,8 @@ export function ERR_FAIL_COND_V_MSG(test: boolean, check: boolean, log: string) 
 }
 
 export function WARN_PRINT(log: string) {
-  console.warn(log);
+  if (LOG_LEVEL >= LogLevel.WARN)
+    console.warn(log);
 }
 
 export function ERR_FAIL_V(log: string) {
@@ -29,7 +42,8 @@ export function ERR_FAIL_V(log: string) {
 }
 
 export function ERR_PRINT(log: string) {
-  console.error(log);
+  if (LOG_LEVEL >= LogLevel.ERROR)
+    console.error(log);
 }
 
 export const decoder = new TextDecoder();

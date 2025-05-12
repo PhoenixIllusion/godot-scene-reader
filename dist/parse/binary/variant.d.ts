@@ -156,23 +156,23 @@ export declare class Array implements VariantType {
 }
 export declare class PackedByteArray implements VariantType {
     type: string;
-    value: Uint8Array;
+    value: Uint8Array<ArrayBuffer>;
 }
 export declare class PackedInt32Array implements VariantType {
     type: string;
-    value: Int32Array;
+    value: Int32Array<ArrayBuffer>;
 }
 export declare class PackedInt64Array implements VariantType {
     type: string;
-    value: BigInt64Array;
+    value: BigInt64Array<ArrayBuffer>;
 }
 export declare class PackedF32Array implements VariantType {
     type: string;
-    value: Float32Array;
+    value: Float32Array<ArrayBuffer>;
 }
 export declare class PackedF64Array implements VariantType {
     type: string;
-    value: Float64Array;
+    value: Float64Array<ArrayBuffer>;
 }
 export declare class PackedStringArray implements VariantType {
     type: string;

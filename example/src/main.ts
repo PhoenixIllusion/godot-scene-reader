@@ -2,7 +2,7 @@ import { try_open_bin_resource } from 'godot-scene-reader/parse/binary/resource.
 import './style.css'
 import { dump_cyclic_to_link } from 'godot-scene-reader/extras/dump.js';
 import { parse_text_resource } from 'godot-scene-reader/parse/index.js';
-import { dump_pck_file } from 'godot-scene-reader/extras/create_tar.js';
+import { dump_pck_file } from './create_tar';
 
 const input = document.getElementById('file-input') as HTMLInputElement;
 const out = document.getElementById('app') as HTMLDivElement;

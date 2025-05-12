@@ -1,5 +1,12 @@
 export declare const VERSION_MAJOR = 4;
 export declare const VERSION_MINOR = 4;
+export declare const enum LogLevel {
+    OFF = 0,
+    ERROR = 1,
+    WARN = 2,
+    VERBOSE = 3
+}
+export declare function setLogLevel(level: LogLevel): void;
 export declare function ERR_FAIL_V_MSG(label: string, log: string): void;
 export declare function ERR_FAIL_COND_V_MSG(test: boolean, check: boolean, log: string): void;
 export declare function WARN_PRINT(log: string): void;

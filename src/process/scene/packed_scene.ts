@@ -1,6 +1,6 @@
 import { InternalResourceEntry } from "../../parse/binary/resource";
 import { assertType, unwrap_dictionary, unwrap_string } from "../../parse/binary/util/assert_unpack";
-import { Array, Dictionary, Integer, PackedInt32Array, PackedStringArray, VariantType } from "../../parse/binary/variant";
+import { Array, Dictionary, Integer, NodePath, PackedInt32Array, PackedStringArray, VariantType } from "../../parse/binary/variant";
 
 export const enum PackedScene_NameMask {
   NO_PARENT_SAVED = 0x7FFFFFFF,
@@ -16,8 +16,12 @@ export const enum PackedScene_Flags {
   FLAG_MASK = (1 << 24) - 1,
 }
 
+interface PathResolution { full_path: NodePath, remaining_path: string[] };
+
 export interface SceneNode {
   parent: null | SceneNode;
+  path: string[];
+  is_path: null | PathResolution;
   owner: number;
   type: string;
 
@@ -26,20 +30,23 @@ export interface SceneNode {
   instance: VariantType | null;
   properties: Record<string, VariantType>;
   groups: number[];
+  children: SceneNode[];
 }
 
 export class PackedScene {
 
   nodes: SceneNode[] = [];
+  paths: Record<string, SceneNode> = {};
+
   constructor(resource: InternalResourceEntry) {
-    const _bundled = resource.props.find(x => x.name == "_bundled");
+    const _bundled = resource.properties["_bundled"];
     if (!_bundled) {
       throw new Error("PackedScene only coded for bundled scene.")
     }
-    if (!(_bundled.value instanceof Dictionary)) {
+    if (!(_bundled instanceof Dictionary)) {
       throw new Error("PackedScene _bundled not Dictionary")
     }
-    const bundle = unwrap_dictionary(_bundled.value);
+    const bundle = unwrap_dictionary(_bundled);
     const names: string[] = [];
     {
       const _names: PackedStringArray = assertType(bundle['names'], "packed_string_array");
@@ -48,13 +55,12 @@ export class PackedScene {
 
     const variants: VariantType[] = assertType<Array>(bundle['variants'], "array").value;
 
-    //const conn_count = assertType<Integer>(bundle['conn_count'], "int32").value;
-    //const conns = assertType<PackedInt32Array>(bundle['conns'], "packed_int32_array").value
+    // const conn_count = assertType<Integer>(bundle['conn_count'], "int32").value;
+    // const conns = assertType<PackedInt32Array>(bundle['conns'], "packed_int32_array").value
 
     //const node_count = assertType<Integer>(bundle['node_count'], "int32").value;
     const nodes = assertType<PackedInt32Array>(bundle['nodes'], "packed_int32_array").value
-
-    //const node_paths = assertType<Array>(bundle['node_paths'], "array").value;
+    const node_paths = assertType<Array>(bundle['node_paths'], "array").value as NodePath[];
 
     const base_scene_idx = bundle['base_scene'] ? assertType<Integer>(bundle['base_scene'], "int32").value : -1;
 
@@ -73,9 +79,27 @@ export class PackedScene {
       return null;
     }
 
+    const resolveParent = (parent_idx: number, is_path: NodePath | null, name: string): { parent: null | SceneNode, path: string[], is_path: null | PathResolution } => {
+      if (parent_idx < 0) {
+        return { parent: null, path: [], is_path: null }
+      }
+      if (!is_path) {
+        const parent = this.nodes[parent_idx];
+        const path = [...parent.path, name];
+        return { parent, path, is_path: null };
+      }
+      const nodePath = is_path.names.map(x => x.value);
+      const { node, remaining_path } = this.findNode(nodePath);
+      if (node == this.nodes[0] && remaining_path.length == 0)
+        throw new Error(`Unable to lookup path [${is_path.names.map(x => x.value).join('/')}]`);
+      return {
+        parent: node, path: [...nodePath, name], is_path: { full_path: is_path, remaining_path }
+      }
+    }
+
     let idx = 0;
     while (idx < nodes.length) {
-      const parent = nodes[idx++];
+      const parent_idx = nodes[idx++];
       const owner = nodes[idx++];
       const type = nodes[idx++];
       const name_index = nodes[idx++];
@@ -83,17 +107,25 @@ export class PackedScene {
       const index = (name_index >> PackedScene_NameMask.NAME_INDEX_BITS) - 1;
       const instance = nodes[idx++];
 
-      const parent_r = parent < 0 ? null : this.nodes[parent]!
+      const node_path = (parent_idx & PackedScene_Flags.FLAG_ID_IS_PATH) ? node_paths[parent_idx & PackedScene_Flags.FLAG_MASK] : null;
+      const { parent, path, is_path } = resolveParent(parent_idx, node_path, names[name]);
       const node: SceneNode = {
-        parent: parent_r,
+        parent,
+        path,
+        is_path,
         owner,
         type: type === PackedScene_Flags.TYPE_INSTANTIATED ? "_instantiated" : names[type],
         name: names[name],
         index,
-        instance: get_node_instance(instance, parent_r),
+        instance: get_node_instance(instance, parent),
         groups: [],
-        properties: {}
+        properties: {},
+        children: []
       }
+      if (parent) {
+        parent.children.push(node);
+      }
+      this.paths[node.path.join('/')] = node;
 
       const prop_count = nodes[idx++];
       for (let j = 0; j < prop_count; j++) {
@@ -106,6 +138,24 @@ export class PackedScene {
         node.groups[j] = nodes[idx++];
       }
       this.nodes.push(node);
+    }
+  }
+  findNode(nodePath: string[]): { node: SceneNode, remaining_path: string[] } {
+    let result: SceneNode = this.nodes[0];
+    let remaining_path: string[] = [];
+
+    for (const [idx, node] of nodePath.entries()) {
+      result = result.children.find(x => x.name == node)!;
+      remaining_path = nodePath.slice(idx + 1);
+      if (!parent) {
+        throw new Error(`Unable to lookup path [${nodePath.join('/')}]`);
+      }
+      if (result.type == "_instantiated")
+        break
+    }
+
+    return {
+      node: result, remaining_path
     }
   }
 

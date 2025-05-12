@@ -12,13 +12,6 @@ export function assertType(variantT, type) {
     }
     return variantT;
 }
-export function unwrap_props(resource) {
-    const response = {};
-    resource.props.forEach(prop => {
-        response[prop.name] = prop.value;
-    });
-    return response;
-}
 export function unwrap_dictionary(dictionary) {
     const result = {};
     [...dictionary.value.entries()].forEach(([key, val]) => {
@@ -29,4 +22,15 @@ export function unwrap_dictionary(dictionary) {
         result[keyStr.value] = val;
     });
     return result;
+}
+export function unwrap_array(array) {
+    return assertType(array, "array").value;
+}
+export function unwrap_array_map(array, type) {
+    return assertType(array, "array").value.map(x => assertType(x, type));
+}
+export function unwrap_value(variant) {
+    if (typeof variant !== 'object' || !('value' in variant))
+        throw new Error(`Assert Fail: Attempted to unwrap non-value variant: ${variant.type}`);
+    return variant.value;
 }

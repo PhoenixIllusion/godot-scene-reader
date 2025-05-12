@@ -101,7 +101,7 @@ function _v2_sub_mult(vec, sub, mult) {
 export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, p_skin_data, p_vertex_len, p_index_data, p_index_len, p_aabb, p_uv_scale) {
     const offsets = [];
     const elem_size = mesh_surface_make_offsets_from_format(p_format, p_vertex_len, p_index_len, offsets);
-    const { vertex_element_size } = elem_size;
+    const { vertex_element_size, attrib_element_size, skin_element_size } = elem_size;
     const ret = [];
     const uv_scale = [0, 0, 0, 0];
     {
@@ -148,9 +148,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                                 const normalsw = normals;
                                 const tangents = [];
                                 const tangentsw = tangents;
-                                const _n_array = reinterpret_cast(Uint32Array, r, offsets[ArrayType.ARRAY_NORMAL], p_vertex_len);
+                                const _n_stride = elem_size.normal_element_size / 4;
+                                const _n_array = reinterpret_cast(Uint32Array, r, offsets[ArrayType.ARRAY_NORMAL]);
                                 for (let j = 0; j < p_vertex_len; j++) {
-                                    const n = _n_array[j];
+                                    const n = _n_array[j * _n_stride];
                                     const axis = octahedron_decode((n & 0xFFFF) / 65535.0, ((n >> 16) & 0xFFFF) / 65535.0);
                                     const v = reinterpret_cast(Uint16Array, r, j * vertex_element_size + offsets[i], 4);
                                     const vec = [(v[0]) / 65535.0, (v[1]) / 65535.0, (v[2]) / 65535.0];
@@ -179,9 +180,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                     if (!(p_format & ArrayFormat.ARRAY_FLAG_COMPRESS_ATTRIBUTES)) {
                         const arr = [];
                         const w = arr;
-                        const _v_arr = reinterpret_cast(Uint32Array, r, offsets[i], p_vertex_len);
+                        const _n_stride = elem_size.normal_element_size / 4;
+                        const _v_arr = reinterpret_cast(Uint32Array, r, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr[j];
+                            const v = _v_arr[j * _n_stride];
                             w[j] = octahedron_decode((v & 0xFFFF) / 65535.0, ((v >> 16) & 0xFFFF) / 65535.0);
                         }
                         ret[i] = arr;
@@ -193,9 +195,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                     if (!(p_format & ArrayFormat.ARRAY_FLAG_COMPRESS_ATTRIBUTES)) {
                         const arr = [];
                         const w = arr;
-                        const _v_arr = reinterpret_cast(Uint32Array, r, offsets[i], p_vertex_len);
+                        const _n_stride = elem_size.normal_element_size / 4;
+                        const _v_arr = reinterpret_cast(Uint32Array, r, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr[j];
+                            const v = _v_arr[j * _n_stride];
                             const { res, tangent_sign } = octahedron_tangent_decode([(v & 0xFFFF) / 65535.0, ((v >> 16) & 0xFFFF) / 65535.0]);
                             w[j] = [...res, tangent_sign];
                         }
@@ -210,9 +213,9 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                     if (!ar) {
                         throw new Error("No Attrute Array");
                     }
-                    const _v_arr = reinterpret_cast(Uint8Array, ar, offsets[i], p_vertex_len * 4);
+                    const _v_arr = reinterpret_cast(Uint8Array, ar, offsets[i]);
                     for (let j = 0; j < p_vertex_len; j++) {
-                        const v = _v_arr.subarray(j * 4, j * 4 + 4);
+                        const v = _v_arr.subarray(j * attrib_element_size, j * attrib_element_size + 4);
                         w[j] = [v[0] / 255.0, v[1] / 255.0, v[2] / 255.0, v[3] / 255.0];
                     }
                     ret[i] = arr;
@@ -226,9 +229,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                     }
                     const w = arr;
                     if (p_format & ArrayFormat.ARRAY_FLAG_COMPRESS_ATTRIBUTES) {
-                        const _v_arr = reinterpret_cast(Uint16Array, ar, offsets[i], p_vertex_len * 2);
+                        const _v_stride = attrib_element_size / 2;
+                        const _v_arr = reinterpret_cast(Uint16Array, ar, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr.subarray(j * 2, j * 2 + 2);
+                            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + 2);
                             let vec = [(v[0]) / 65535.0, (v[1]) / 65535.0];
                             if (!is_zero_approx(uv_scale)) {
                                 vec = _v2_sub_mult(vec, [0.5, 0.5], [p_uv_scale.x, p_uv_scale.y]);
@@ -237,9 +241,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                         }
                     }
                     else {
-                        const _v_arr = reinterpret_cast(Float32Array, ar, offsets[i], p_vertex_len * 2);
+                        const _v_stride = attrib_element_size / 4;
+                        const _v_arr = reinterpret_cast(Float32Array, ar, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr.subarray(j * 2, j * 2 + 2);
+                            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + 2);
                             w[j] = [v[0], v[1]];
                         }
                     }
@@ -254,9 +259,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                         throw new Error("No Attrute Array");
                     }
                     if (p_format & ArrayFormat.ARRAY_FLAG_COMPRESS_ATTRIBUTES) {
-                        const _v_arr = reinterpret_cast(Uint16Array, ar, offsets[i], p_vertex_len * 2);
+                        const _v_stride = attrib_element_size / 2;
+                        const _v_arr = reinterpret_cast(Uint16Array, ar, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr.subarray(j * 2, j * 2 + 2);
+                            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + 2);
                             let vec = [(v[0]) / 65535.0, (v[1]) / 65535.0];
                             if (!is_zero_approx(uv_scale)) {
                                 vec = _v2_sub_mult(vec, [0.5, 0.5], [p_uv_scale.z, p_uv_scale.w]);
@@ -265,9 +271,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                         }
                     }
                     else {
-                        const _v_arr = reinterpret_cast(Float32Array, ar, offsets[i], p_vertex_len * 2);
+                        const _v_stride = attrib_element_size / 4;
+                        const _v_arr = reinterpret_cast(Float32Array, ar, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr.subarray(j * 2, j * 2 + 2);
+                            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + 2);
                             w[j] = [v[0], v[1]];
                         }
                     }
@@ -292,9 +299,9 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                                 // Size 4
                                 const s = type == ArrayCustomFormat.ARRAY_CUSTOM_RGBA_HALF ? 8 : 4;
                                 const arr = [];
-                                const _v_arr = reinterpret_cast(Uint8Array, ar, offsets[i], p_vertex_len * s);
+                                const _v_arr = reinterpret_cast(Uint8Array, ar, offsets[i]);
                                 for (let j = 0; j < p_vertex_len; j++) {
-                                    const v = _v_arr.subarray(j * s, j * s + s);
+                                    const v = _v_arr.subarray(j * attrib_element_size, j * attrib_element_size + s);
                                     arr[j] = v;
                                 }
                                 ret[i] = arr;
@@ -307,9 +314,9 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                             {
                                 const s = type - ArrayCustomFormat.ARRAY_CUSTOM_R_FLOAT + 1;
                                 const arr = [];
-                                const _v_arr = reinterpret_cast(Uint8Array, ar, offsets[i], p_vertex_len * s);
+                                const _v_arr = reinterpret_cast(Uint8Array, ar, offsets[i]);
                                 for (let j = 0; j < p_vertex_len; j++) {
-                                    const v = _v_arr.subarray(j * s, j * s + s);
+                                    const v = _v_arr.subarray(j * attrib_element_size, j * attrib_element_size + s);
                                     arr[j] = v;
                                 }
                                 ret[i] = arr;
@@ -329,9 +336,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                             throw new Error("No Skin Array");
                         }
                         const w = arr;
-                        const _v_arr = reinterpret_cast(Uint16Array, sr, offsets[i], p_vertex_len * bone_count);
+                        const _v_stride = skin_element_size / 2;
+                        const _v_arr = reinterpret_cast(Uint16Array, sr, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr.subarray(j * bone_count, j * bone_count + bone_count);
+                            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + bone_count);
                             for (let k = 0; k < bone_count; k++) {
                                 w[j * bone_count + k] = (v[k] / 65535.0);
                             }
@@ -349,9 +357,10 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                             throw new Error("No Skin Array");
                         }
                         const w = arr;
-                        const _v_arr = reinterpret_cast(Uint16Array, sr, offsets[i], p_vertex_len * bone_count);
+                        const _v_stride = skin_element_size / 2;
+                        const _v_arr = reinterpret_cast(Uint16Array, sr, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr.subarray(j * bone_count, j * bone_count + bone_count);
+                            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + bone_count);
                             for (let k = 0; k < bone_count; k++) {
                                 w[j * bone_count + k] = (v[k] / 65535.0);
                             }

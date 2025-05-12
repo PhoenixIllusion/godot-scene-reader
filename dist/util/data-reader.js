@@ -1,5 +1,16 @@
 export const VERSION_MAJOR = 4;
 export const VERSION_MINOR = 4;
+export var LogLevel;
+(function (LogLevel) {
+    LogLevel[LogLevel["OFF"] = 0] = "OFF";
+    LogLevel[LogLevel["ERROR"] = 1] = "ERROR";
+    LogLevel[LogLevel["WARN"] = 2] = "WARN";
+    LogLevel[LogLevel["VERBOSE"] = 3] = "VERBOSE";
+})(LogLevel || (LogLevel = {}));
+let LOG_LEVEL = LogLevel.OFF;
+export function setLogLevel(level) {
+    LOG_LEVEL = level;
+}
 function bigIntToInt(bigInt) {
     if (bigInt >= Number.MIN_SAFE_INTEGER && bigInt <= Number.MAX_SAFE_INTEGER) {
         return Number(bigInt);
@@ -17,13 +28,15 @@ export function ERR_FAIL_COND_V_MSG(test, check, log) {
     }
 }
 export function WARN_PRINT(log) {
-    console.warn(log);
+    if (LOG_LEVEL >= LogLevel.WARN)
+        console.warn(log);
 }
 export function ERR_FAIL_V(log) {
     new Error(log);
 }
 export function ERR_PRINT(log) {
-    console.error(log);
+    if (LOG_LEVEL >= LogLevel.ERROR)
+        console.error(log);
 }
 export const decoder = new TextDecoder();
 export class DataReader {

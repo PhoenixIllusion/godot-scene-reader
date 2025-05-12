@@ -1,10 +1,10 @@
 import { InternalResourceEntry } from "../../../parse/binary/resource";
-import { assertType, unwrap_dictionary, unwrap_props, unwrap_string } from "../../../parse/binary/util/assert_unpack";
+import { assertType, unwrap_dictionary, unwrap_string } from "../../../parse/binary/util/assert_unpack";
 import { AABB, Array, Dictionary, Integer, Integer64, PackedByteArray, VariantType, Vector4 } from "../../../parse/binary/variant";
 import { PrimitiveType, ARRAY_FLAG_MASK, BlendShapeMode } from "./mesh_types";
 import { _get_array_from_surface } from "./mesh_get_arrays";
 
-type ArrayData = ((number[] | [number, number][] | [number, number, number][] | [number, number, number, number][]) | Uint8Array[]);
+export type ArrayData = ((number[] | [number, number][] | [number, number, number][] | [number, number, number, number][]) | Uint8Array[]);
 
 export class Surface {
   primitive: PrimitiveType;
@@ -15,6 +15,8 @@ export class Surface {
   aabb: AABB;
   uv_scale: Vector4;
   arrays: ArrayData[];
+
+  material?: VariantType;
 
   constructor(surface: Record<string, VariantType>) {
     const format = Number(assertType<Integer64>(surface["format"], "int64").value & ARRAY_FLAG_MASK);
@@ -27,23 +29,22 @@ export class Surface {
     this.aabb = surface["aabb"] ? assertType<AABB>(surface["aabb"], "aabb") : new AABB();
     this.uv_scale = surface["uv_scale"] ? assertType<Vector4>(surface["uv_scale"], "vector4") : new Vector4();
 
-    const vertex_data = assertType<PackedByteArray>(surface["vertex_data"], "packed_byte_array").value;
-    const attribute_data = surface["attribute_data"] ? assertType<PackedByteArray>(surface["attribute_data"], "packed_byte_array").value : null;
-    const index_data = surface["index_data"] ? assertType<PackedByteArray>(surface["index_data"], "packed_byte_array").value : null;
-    const skin_data = surface["skin_data"] ? assertType<PackedByteArray>(surface["skin_data"], "packed_byte_array").value : null;
-
+    const vertex_data = assertType<PackedByteArray>(surface["vertex_data"], "packed_byte_array").value.buffer;
+    const attribute_data = surface["attribute_data"] ? assertType<PackedByteArray>(surface["attribute_data"], "packed_byte_array").value?.buffer : null;
+    const index_data = surface["index_data"] ? assertType<PackedByteArray>(surface["index_data"], "packed_byte_array").value?.buffer : null;
+    const skin_data = surface["skin_data"] ? assertType<PackedByteArray>(surface["skin_data"], "packed_byte_array").value?.buffer : null;
+    this.material = surface['material'];
     this.arrays = _get_array_from_surface(format, vertex_data, attribute_data, skin_data, this.vertex_count, index_data, this.index_count, this.aabb, this.uv_scale);
   }
 
 }
 
 export class Mesh {
-
   name: string = '';
   blend_shape_mode: BlendShapeMode;
   surfaces: Surface[] = [];
   constructor(resource: InternalResourceEntry) {
-    const res = unwrap_props(resource);
+    const res = resource.properties;
     this.name = res['resource_name'] ? unwrap_string(res['resource_name']) : "<no_name>";
     this.blend_shape_mode = assertType<Integer>(res['blend_shape_mode'], "int32").value;
 
@@ -55,5 +56,4 @@ export class Mesh {
       this.surfaces.push(new Surface(surface));
     })
   }
-
 }

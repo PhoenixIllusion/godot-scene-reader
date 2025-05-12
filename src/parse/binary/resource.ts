@@ -50,7 +50,7 @@ export interface IntResource {
 
 export interface InternalResourceEntry {
   type: string,
-  props: { name: string, value: VariantType }[]
+  properties: Record<string, VariantType>
 }
 
 export async function try_open_bin_resource(res_path: string, arrayBuffer: ArrayBuffer, p_no_resource: boolean, p_keep_uuid_paths: boolean) {
@@ -184,11 +184,11 @@ export async function try_open_bin_resource(res_path: string, arrayBuffer: Array
     f.seek(resource.offset);
     const type = get_unicode_string();
     const property_count = f.get_32();
-    const entry: InternalResourceEntry = { type, props: [] }
+    const entry: InternalResourceEntry = { type, properties: {} }
     for (let j = 0; j < property_count; j++) {
       const name = _get_string();
       const value = parse_variant(res, f, real_is_double, ver_format, _get_string);
-      entry.props.push({ name, value })
+      entry.properties[name] = value;
     }
     internal_entries.push(entry);
     internal_index_cache.set(resource.path, { type: 'ref', value: entry } as VariantType);
@@ -200,3 +200,4 @@ export async function try_open_bin_resource(res_path: string, arrayBuffer: Array
   };
 
 }
+export type BinResource = Awaited<ReturnType<typeof try_open_bin_resource>>;

@@ -144,11 +144,11 @@ export async function try_open_bin_resource(res_path, arrayBuffer, p_no_resource
         f.seek(resource.offset);
         const type = get_unicode_string();
         const property_count = f.get_32();
-        const entry = { type, props: [] };
+        const entry = { type, properties: {} };
         for (let j = 0; j < property_count; j++) {
             const name = _get_string();
             const value = parse_variant(res, f, real_is_double, ver_format, _get_string);
-            entry.props.push({ name, value });
+            entry.properties[name] = value;
         }
         internal_entries.push(entry);
         internal_index_cache.set(resource.path, { type: 'ref', value: entry });

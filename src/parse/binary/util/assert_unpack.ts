@@ -1,5 +1,4 @@
-import { InternalResourceEntry } from "../resource";
-import { Dictionary, String, StringName, VariantType } from "../variant";
+import { Array, Dictionary, String, StringName, VariantType } from "../variant";
 
 export function unwrap_string(variant: VariantType): string {
   if (!(variant instanceof String || variant instanceof StringName)) {
@@ -16,14 +15,6 @@ export function assertType<T>(variantT: VariantType, type: string): T {
   return variantT as T;
 }
 
-export function unwrap_props(resource: InternalResourceEntry) {
-  const response: Record<string, VariantType> = {}
-  resource.props.forEach(prop => {
-    response[prop.name] = prop.value;
-  });
-  return response;
-}
-
 export function unwrap_dictionary(dictionary: Dictionary) {
   const result: Record<string, VariantType> = {};
   [...dictionary.value.entries()].forEach(([key, val]) => {
@@ -34,4 +25,18 @@ export function unwrap_dictionary(dictionary: Dictionary) {
     result[keyStr.value] = val;
   });
   return result;
+}
+
+export function unwrap_array(array: VariantType): VariantType[] {
+  return assertType<Array>(array, "array").value;
+}
+
+export function unwrap_array_map<T>(array: VariantType, type: string): T[] {
+  return assertType<Array>(array, "array").value.map(x => assertType<T>(x, type));
+}
+
+export function unwrap_value<T>(variant: VariantType): T {
+  if (typeof variant !== 'object' || !('value' in variant))
+    throw new Error(`Assert Fail: Attempted to unwrap non-value variant: ${variant.type}`);
+  return variant.value as T;
 }

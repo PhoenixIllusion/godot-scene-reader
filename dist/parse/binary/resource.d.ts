@@ -10,10 +10,7 @@ export interface IntResource {
 }
 export interface InternalResourceEntry {
     type: string;
-    props: {
-        name: string;
-        value: VariantType;
-    }[];
+    properties: Record<string, VariantType>;
 }
 export declare function try_open_bin_resource(res_path: string, arrayBuffer: ArrayBuffer, p_no_resource: boolean, p_keep_uuid_paths: boolean): Promise<{
     res_path: string;
@@ -32,3 +29,4 @@ export declare function try_open_bin_resource(res_path: string, arrayBuffer: Arr
     string_map: Record<number, string>;
     internal_entries: InternalResourceEntry[];
 } | undefined>;
+export type BinResource = Awaited<ReturnType<typeof try_open_bin_resource>>;

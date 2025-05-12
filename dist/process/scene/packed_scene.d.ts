@@ -1,5 +1,5 @@
 import { InternalResourceEntry } from "../../parse/binary/resource";
-import { VariantType } from "../../parse/binary/variant";
+import { NodePath, VariantType } from "../../parse/binary/variant";
 export declare const enum PackedScene_NameMask {
     NO_PARENT_SAVED = 2147483647,
     NAME_INDEX_BITS = 18,
@@ -13,8 +13,14 @@ export declare const enum PackedScene_Flags {
     FLAG_PROP_NAME_MASK = 1073741823,
     FLAG_MASK = 16777215
 }
+interface PathResolution {
+    full_path: NodePath;
+    remaining_path: string[];
+}
 export interface SceneNode {
     parent: null | SceneNode;
+    path: string[];
+    is_path: null | PathResolution;
     owner: number;
     type: string;
     name: string;
@@ -22,8 +28,15 @@ export interface SceneNode {
     instance: VariantType | null;
     properties: Record<string, VariantType>;
     groups: number[];
+    children: SceneNode[];
 }
 export declare class PackedScene {
     nodes: SceneNode[];
+    paths: Record<string, SceneNode>;
     constructor(resource: InternalResourceEntry);
+    findNode(nodePath: string[]): {
+        node: SceneNode;
+        remaining_path: string[];
+    };
 }
+export {};
