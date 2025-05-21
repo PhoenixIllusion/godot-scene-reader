@@ -1,6 +1,5 @@
-import { String, StringName } from "../variant";
 export function unwrap_string(variant) {
-    if (!(variant instanceof String || variant instanceof StringName)) {
+    if (!(variant.type == 'string' || variant.type == 'stringname')) {
         throw new Error("Attempted to Unwrap String, but not String or StringName");
     }
     const str = variant;
@@ -15,7 +14,7 @@ export function assertType(variantT, type) {
 export function unwrap_dictionary(dictionary) {
     const result = {};
     [...dictionary.value.entries()].forEach(([key, val]) => {
-        if (!(key instanceof String || key instanceof StringName)) {
+        if (!(key.type == 'string' || key.type == 'stringname')) {
             throw new Error("Dictionary key not String or StringName");
         }
         const keyStr = key;

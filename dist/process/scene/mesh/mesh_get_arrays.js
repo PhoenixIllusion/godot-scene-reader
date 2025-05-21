@@ -336,13 +336,9 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                             throw new Error("No Skin Array");
                         }
                         const w = arr;
-                        const _v_stride = skin_element_size / 2;
-                        const _v_arr = reinterpret_cast(Uint16Array, sr, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + bone_count);
-                            for (let k = 0; k < bone_count; k++) {
-                                w[j * bone_count + k] = (v[k] / 65535.0);
-                            }
+                            const v = reinterpret_cast(Uint16Array, sr, j * skin_element_size + offsets[i], bone_count);
+                            w[j] = [...v].map(x => x / 65535.0);
                         }
                     }
                     ret[i] = arr;
@@ -357,13 +353,9 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                             throw new Error("No Skin Array");
                         }
                         const w = arr;
-                        const _v_stride = skin_element_size / 2;
-                        const _v_arr = reinterpret_cast(Uint16Array, sr, offsets[i]);
                         for (let j = 0; j < p_vertex_len; j++) {
-                            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + bone_count);
-                            for (let k = 0; k < bone_count; k++) {
-                                w[j * bone_count + k] = (v[k] / 65535.0);
-                            }
+                            const v = reinterpret_cast(Uint16Array, sr, j * skin_element_size + offsets[i], bone_count);
+                            w[j] = [...v];
                         }
                         ret[i] = arr;
                     }

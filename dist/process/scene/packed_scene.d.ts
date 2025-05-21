@@ -18,7 +18,6 @@ interface PathResolution {
     remaining_path: string[];
 }
 export interface SceneNode {
-    parent: null | SceneNode;
     path: string[];
     is_path: null | PathResolution;
     owner: number;
@@ -35,7 +34,7 @@ export declare class PackedScene {
     paths: Record<string, SceneNode>;
     constructor(resource: InternalResourceEntry);
     findNode(nodePath: string[]): {
-        node: SceneNode;
+        node: SceneNode | undefined;
         remaining_path: string[];
     };
 }

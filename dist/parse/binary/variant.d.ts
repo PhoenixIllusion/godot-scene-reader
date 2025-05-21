@@ -198,9 +198,9 @@ export interface ResourceData {
     res_path: string;
     using_named_scene_ids: boolean;
     internal_resources: IntResource[];
-    internal_index_cache: Map<string, VariantType>;
+    internal_index_cache: Record<string, VariantType>;
     external_resources: ExtResource[];
-    remaps: Map<string, string>;
+    remaps: Record<string, string>;
     loadExternal(path: string, extType: string, cache_mode_for_external: number): VariantType;
     loadExternalRes(external_resources: ExtResource): VariantType;
     localizePath(res_path: string, path: string): string;

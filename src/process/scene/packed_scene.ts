@@ -19,7 +19,6 @@ export const enum PackedScene_Flags {
 interface PathResolution { full_path: NodePath, remaining_path: string[] };
 
 export interface SceneNode {
-  parent: null | SceneNode;
   path: string[];
   is_path: null | PathResolution;
   owner: number;
@@ -43,10 +42,10 @@ export class PackedScene {
     if (!_bundled) {
       throw new Error("PackedScene only coded for bundled scene.")
     }
-    if (!(_bundled instanceof Dictionary)) {
+    if (!(_bundled.type == 'dictionary')) {
       throw new Error("PackedScene _bundled not Dictionary")
     }
-    const bundle = unwrap_dictionary(_bundled);
+    const bundle = unwrap_dictionary(<Dictionary>_bundled);
     const names: string[] = [];
     {
       const _names: PackedStringArray = assertType(bundle['names'], "packed_string_array");
@@ -89,11 +88,15 @@ export class PackedScene {
         return { parent, path, is_path: null };
       }
       const nodePath = is_path.names.map(x => x.value);
-      const { node, remaining_path } = this.findNode(nodePath);
+      let { node, remaining_path } = this.findNode(nodePath);
+      if(this.nodes[0].type == "_instantiated") { // root is extern, we can't look anything up
+        node = this.nodes[0];
+        remaining_path = nodePath;
+      }
       if (node == this.nodes[0] && remaining_path.length == 0)
         throw new Error(`Unable to lookup path [${is_path.names.map(x => x.value).join('/')}]`);
       return {
-        parent: node, path: [...nodePath, name], is_path: { full_path: is_path, remaining_path }
+        parent: node || null, path: [...nodePath, name], is_path: { full_path: is_path, remaining_path }
       }
     }
 
@@ -110,7 +113,6 @@ export class PackedScene {
       const node_path = (parent_idx & PackedScene_Flags.FLAG_ID_IS_PATH) ? node_paths[parent_idx & PackedScene_Flags.FLAG_MASK] : null;
       const { parent, path, is_path } = resolveParent(parent_idx, node_path, names[name]);
       const node: SceneNode = {
-        parent,
         path,
         is_path,
         owner,
@@ -140,17 +142,17 @@ export class PackedScene {
       this.nodes.push(node);
     }
   }
-  findNode(nodePath: string[]): { node: SceneNode, remaining_path: string[] } {
-    let result: SceneNode = this.nodes[0];
+  findNode(nodePath: string[]): { node: SceneNode|undefined, remaining_path: string[] } {
+    let result: SceneNode|undefined = this.nodes[0];
     let remaining_path: string[] = [];
 
     for (const [idx, node] of nodePath.entries()) {
-      result = result.children.find(x => x.name == node)!;
+      result = result?.children.find(x => x.name == node);
       remaining_path = nodePath.slice(idx + 1);
-      if (!parent) {
+      if (!result) {
         throw new Error(`Unable to lookup path [${nodePath.join('/')}]`);
       }
-      if (result.type == "_instantiated")
+      if (result?.type == "_instantiated")
         break
     }
 

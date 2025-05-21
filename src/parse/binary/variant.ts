@@ -202,9 +202,9 @@ export interface ResourceData {
 	res_path: string;
 	using_named_scene_ids: boolean;
 	internal_resources: IntResource[];
-	internal_index_cache: Map<string, VariantType>;
+	internal_index_cache: Record<string, VariantType>;
 	external_resources: ExtResource[];
-	remaps: Map<string, string>;
+	remaps: Record<string, string>;
 	loadExternal(path: string, extType: string, cache_mode_for_external: number): VariantType;
 	loadExternalRes(external_resources: ExtResource): VariantType;
 	localizePath(res_path: string, path: string): string;
@@ -462,11 +462,11 @@ export function parse_variant(res: ResourceData, f: GodotReader, use_real64: boo
 					}
 
 					//always use internal cache for loading internal resources
-					if (!res.internal_index_cache.has(path)) {
+					if (!res.internal_index_cache[path]) {
 						WARN_PRINT(`Couldn't load resource (no cache): ${res.res_path}.`);
 						r_v = new Nil();
 					} else {
-						r_v = res.internal_index_cache.get(path)!;
+						r_v = res.internal_index_cache[path]!;
 					}
 				} break;
 				case BIN.OBJECT_EXTERNAL_RESOURCE: {
@@ -480,8 +480,8 @@ export function parse_variant(res: ResourceData, f: GodotReader, use_real64: boo
 						path = res.localizePath(res.res_path, path);
 					}
 
-					if (res.remaps.has(path)) {
-						path = res.remaps.get(path)!;
+					if (res.remaps[path]) {
+						path = res.remaps[path]!;
 					}
 
 					const result = res.loadExternal(path, exttype, cache_mode_for_external);

@@ -560,12 +560,12 @@ export function parse_variant(res, f, use_real64, ver_format, _get_string) {
                                 path += res.res_path + "::" + index;
                             }
                             //always use internal cache for loading internal resources
-                            if (!res.internal_index_cache.has(path)) {
+                            if (!res.internal_index_cache[path]) {
                                 WARN_PRINT(`Couldn't load resource (no cache): ${res.res_path}.`);
                                 r_v = new Nil();
                             }
                             else {
-                                r_v = res.internal_index_cache.get(path);
+                                r_v = res.internal_index_cache[path];
                             }
                         }
                         break;
@@ -578,8 +578,8 @@ export function parse_variant(res, f, use_real64, ver_format, _get_string) {
                                 // path is relative to file being loaded, so convert to a resource path
                                 path = res.localizePath(res.res_path, path);
                             }
-                            if (res.remaps.has(path)) {
-                                path = res.remaps.get(path);
+                            if (res.remaps[path]) {
+                                path = res.remaps[path];
                             }
                             const result = res.loadExternal(path, exttype, cache_mode_for_external);
                             if (result.type === "nil") {

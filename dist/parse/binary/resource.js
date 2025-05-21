@@ -125,8 +125,8 @@ export async function try_open_bin_resource(res_path, arrayBuffer, p_no_resource
         ir.offset = f.get_64();
         internal_resources.push(ir);
     }
-    const internal_index_cache = new Map();
-    const remaps = new Map();
+    const internal_index_cache = {};
+    const remaps = {};
     const res = {
         res_path,
         using_named_scene_ids,
@@ -151,10 +151,15 @@ export async function try_open_bin_resource(res_path, arrayBuffer, p_no_resource
             entry.properties[name] = value;
         }
         internal_entries.push(entry);
-        internal_index_cache.set(resource.path, { type: 'ref', value: entry });
+        internal_index_cache[resource.path] = { type: 'ref', value: entry };
     });
     return {
         type, uid, script_class, string_map, internal_entries,
-        ...res
+        res_path,
+        using_named_scene_ids,
+        internal_resources,
+        internal_index_cache,
+        external_resources,
+        remaps
     };
 }

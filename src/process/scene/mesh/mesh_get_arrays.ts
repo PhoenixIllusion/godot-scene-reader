@@ -9,13 +9,15 @@ type F1 = number
 type F2 = [number, number]
 type F3 = [number, number, number];
 type F4 = [number, number, number, number];
+type F8 = [number, number, number, number,number, number, number, number];
 
 type F1A = F1[]
 type F2A = F2[]
 type F3A = F3[]
 type F4A = F4[]
+type F8A = F8[]
 
-type FA = F1A | F2A | F3A | F4A;
+export type FA = F1A | F2A | F3A | F4A | F8A;
 
 type TypedArray = Uint8Array | Int8Array |
   Uint16Array | Int16Array |
@@ -391,21 +393,16 @@ export function _get_array_from_surface(p_format: number, p_vertex_data: ArrayBu
       case ArrayType.ARRAY_WEIGHTS: {
         const bone_count = (p_format & ArrayFormat.ARRAY_FLAG_USE_8_BONE_WEIGHTS) ? 8 : 4;
 
-        const arr: F1A = [];
+        const arr: F4A|F8A = [];
 
         if (bone_count) {
           if (!sr) {
             throw new Error("No Skin Array");
           }
           const w = arr;
-
-          const _v_stride = skin_element_size / 2;
-          const _v_arr = reinterpret_cast(Uint16Array, sr, offsets[i])
           for (let j = 0; j < p_vertex_len; j++) {
-            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + bone_count);
-            for (let k = 0; k < bone_count; k++) {
-              w[j * bone_count + k] = (v[k] / 65535.0);
-            }
+            const v = reinterpret_cast(Uint16Array, sr, j * skin_element_size + offsets[i], bone_count)
+            w[j] = [... v].map(x => x  / 65535.0) as F4|F8
           }
         }
 
@@ -415,21 +412,16 @@ export function _get_array_from_surface(p_format: number, p_vertex_data: ArrayBu
       case ArrayType.ARRAY_BONES: {
         const bone_count = (p_format & ArrayFormat.ARRAY_FLAG_USE_8_BONE_WEIGHTS) ? 8 : 4;
 
-        const arr: F1A = [];
+        const arr: F4A|F8A = [];
 
         if (bone_count) {
           if (!sr) {
             throw new Error("No Skin Array");
           }
           const w = arr;
-
-          const _v_stride = skin_element_size / 2;
-          const _v_arr = reinterpret_cast(Uint16Array, sr, offsets[i])
           for (let j = 0; j < p_vertex_len; j++) {
-            const v = _v_arr.subarray(j * _v_stride, j * _v_stride + bone_count);
-            for (let k = 0; k < bone_count; k++) {
-              w[j * bone_count + k] = (v[k] / 65535.0);
-            }
+            const v = reinterpret_cast(Uint16Array, sr, j * skin_element_size + offsets[i], bone_count)
+            w[j] = [... v] as F4|F8
           }
 
           ret[i] = arr;

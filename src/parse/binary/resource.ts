@@ -164,8 +164,8 @@ export async function try_open_bin_resource(res_path: string, arrayBuffer: Array
     internal_resources.push(ir);
   }
 
-  const internal_index_cache = new Map<string, VariantType>();
-  const remaps = new Map<string, string>();
+  const internal_index_cache: Record<string,VariantType> = {};
+  const remaps: Record<string, string> = {};
   const res: ResourceData = {
     res_path,
     using_named_scene_ids,
@@ -191,12 +191,17 @@ export async function try_open_bin_resource(res_path: string, arrayBuffer: Array
       entry.properties[name] = value;
     }
     internal_entries.push(entry);
-    internal_index_cache.set(resource.path, { type: 'ref', value: entry } as VariantType);
+    internal_index_cache[resource.path] = { type: 'ref', value: entry } as VariantType;
   });
 
   return {
     type, uid, script_class, string_map, internal_entries,
-    ...res
+    res_path,
+    using_named_scene_ids,
+    internal_resources,
+    internal_index_cache,
+    external_resources,
+    remaps
   };
 
 }
