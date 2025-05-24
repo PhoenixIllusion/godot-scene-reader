@@ -1,6 +1,7 @@
 import { DataReader, decoder } from "../../util/data-reader";
 import { TokenType } from "./gdc_tokens";
-import { decode_variant, unmarshaller_type_as_string } from "./unmarshaller";
+import { decode_variant } from "./unmarshaller";
+import { unmarshaller_type_as_string } from "./unmarshaller_type";
 import { GodotReader } from "./util/reader";
 
 import * as fzstd from 'fzstd';

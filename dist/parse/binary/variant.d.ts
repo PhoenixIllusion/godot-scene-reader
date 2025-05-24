@@ -145,6 +145,8 @@ export declare class Callable implements VariantType {
 }
 export declare class Signal implements VariantType {
     type: string;
+    name?: String;
+    object_id?: Integer64;
 }
 export declare class Dictionary implements VariantType {
     type: string;
@@ -153,6 +155,9 @@ export declare class Dictionary implements VariantType {
 export declare class Array implements VariantType {
     type: string;
     value: VariantType[];
+    builtin_type?: Integer;
+    class_name?: String;
+    script?: String;
 }
 export declare class PackedByteArray implements VariantType {
     type: string;

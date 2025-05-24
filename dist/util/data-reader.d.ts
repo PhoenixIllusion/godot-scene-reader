@@ -25,6 +25,7 @@ export declare class DataReader {
     U64(endian?: boolean): number;
     S64(endian?: boolean): number;
     U64_BigInt(endian?: boolean): bigint;
+    S64_BigInt(endian?: boolean): bigint;
     F32(endian?: boolean): number;
     F64(endian?: boolean): number;
     CHUNK(len: number): Uint8Array;

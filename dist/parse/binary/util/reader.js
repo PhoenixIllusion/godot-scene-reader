@@ -10,6 +10,7 @@ export class GodotReader {
     get_S32(lE) { return this.reader.S32(lE); }
     get_64() { return this.reader.U64(); }
     get_S64() { return this.reader.S64(); }
+    get_S64bi() { return this.reader.S64_BigInt(); }
     get_64bi() { return this.reader.U64_BigInt(); }
     seek(idx) { return this.reader.SEEK(idx); }
     get_buffer(len) { return this.reader.CHUNK(len); }

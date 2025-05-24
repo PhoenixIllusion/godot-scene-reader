@@ -17,20 +17,32 @@ interface PathResolution {
     full_path: NodePath;
     remaining_path: string[];
 }
+export interface NodeConnection {
+    from: number;
+    to: number;
+    signal: string;
+    method: string;
+    flags: number;
+    binds: VariantType[];
+    unbinds?: number;
+}
 export interface SceneNode {
     path: string[];
     is_path: null | PathResolution;
     owner: number;
     type: string;
+    parent: number | null;
     name: string;
     index: number;
     instance: VariantType | null;
     properties: Record<string, VariantType>;
     groups: number[];
-    children: SceneNode[];
+    children: number[];
+    connections: [];
 }
 export declare class PackedScene {
     nodes: SceneNode[];
+    connections: NodeConnection[];
     paths: Record<string, SceneNode>;
     constructor(resource: InternalResourceEntry);
     findNode(nodePath: string[]): {

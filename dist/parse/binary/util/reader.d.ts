@@ -10,6 +10,7 @@ export declare class GodotReader {
     get_S32(lE?: boolean): number;
     get_64(): number;
     get_S64(): number;
+    get_S64bi(): bigint;
     get_64bi(): bigint;
     seek(idx: number): void;
     get_buffer(len: number): Uint8Array<ArrayBufferLike>;

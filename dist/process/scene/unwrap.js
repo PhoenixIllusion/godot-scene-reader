@@ -12,6 +12,20 @@ export function unwrap_property_array(properties, field, keys) {
     }
     return ret;
 }
+export function unwrap_property_paths(properties) {
+    const result = {};
+    for (const [path, val] of Object.entries(properties)) {
+        const parts = path.split('/');
+        const key = parts.pop();
+        let root = result;
+        while (parts.length) {
+            const path = parts.shift();
+            root = (root[path] = (root[path] || {}));
+        }
+        root[key] = val;
+    }
+    return result;
+}
 export function unwrap_array(array) {
     return assertType(array, "array").value;
 }
@@ -40,6 +54,9 @@ export function unwrap_property(v) {
         const ref = v.value;
         if (ref.properties)
             return { type: ref.type, properties: unwrap_properties(ref.properties) };
+    }
+    if ('properties' in v) {
+        return { type: v.type, properties: unwrap_properties(v.properties) };
     }
     if (v.type == 'nodepath') {
         const ref = v;

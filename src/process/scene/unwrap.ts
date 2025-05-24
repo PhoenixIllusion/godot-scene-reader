@@ -17,6 +17,20 @@ export function unwrap_property_array<T>(properties: Record<string,any>, field: 
   }
   return ret;
 } 
+export function unwrap_property_paths<T>(properties: Record<string,any>): T {
+  const result: Record<string,any> = {};
+  for(const [path, val] of Object.entries(properties)) {
+    const parts = path.split('/');
+    const key = parts.pop()!;
+    let root = result;
+    while(parts.length) {
+      const path = parts.shift()!;
+      root = (root[path] = (root[path] || {}));
+    }
+    root[key] = val;
+  }
+  return result as T;
+}
 
 export function unwrap_array(array: VariantType): VariantType[] {
   return assertType<ArrayT>(array, "array").value;
@@ -47,6 +61,9 @@ export function unwrap_property<T>(v: VariantType): T {
     const ref = (<LinkRef>v).value as InternalResourceEntry;
     if (ref.properties)
       return { type: ref.type, properties: unwrap_properties(ref.properties) } as T;
+  }
+  if('properties' in v) {
+      return { type: v.type, properties: unwrap_properties(v.properties as Record<string, VariantType>)} as T;
   }
   if(v.type == 'nodepath') {
     const ref = <NodePath>v;

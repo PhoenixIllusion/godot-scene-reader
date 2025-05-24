@@ -80,6 +80,11 @@ export class DataReader {
         this.index += 8;
         return this.dataView.getBigUint64(this.index - 8, endian);
     }
+    S64_BigInt(endian) {
+        endian = endian === undefined ? this.littleEndian : endian;
+        this.index += 8;
+        return this.dataView.getBigInt64(this.index - 8, endian);
+    }
     F32(endian) {
         endian = endian === undefined ? this.littleEndian : endian;
         this.index += 4;

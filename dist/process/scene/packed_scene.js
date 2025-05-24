@@ -19,6 +19,7 @@ export var PackedScene_Flags;
 export class PackedScene {
     constructor(resource) {
         this.nodes = [];
+        this.connections = [];
         this.paths = {};
         const _bundled = resource.properties["_bundled"];
         if (!_bundled) {
@@ -28,14 +29,17 @@ export class PackedScene {
             throw new Error("PackedScene _bundled not Dictionary");
         }
         const bundle = unwrap_dictionary(_bundled);
+        let version = 1;
+        if (bundle['version']) {
+            version = assertType(bundle['version'], "int32").value;
+        }
         const names = [];
         {
             const _names = assertType(bundle['names'], "packed_string_array");
             _names.value.forEach(v => names.push(unwrap_string(v)));
         }
         const variants = assertType(bundle['variants'], "array").value;
-        // const conn_count = assertType<Integer>(bundle['conn_count'], "int32").value;
-        // const conns = assertType<PackedInt32Array>(bundle['conns'], "packed_int32_array").value
+        const conns = assertType(bundle['conns'], "packed_int32_array").value;
         //const node_count = assertType<Integer>(bundle['node_count'], "int32").value;
         const nodes = assertType(bundle['nodes'], "packed_int32_array").value;
         const node_paths = assertType(bundle['node_paths'], "array").value;
@@ -90,6 +94,7 @@ export class PackedScene {
             const { parent, path, is_path } = resolveParent(parent_idx, node_path, names[name]);
             const node = {
                 path,
+                parent: parent ? this.nodes.indexOf(parent) : null,
                 is_path,
                 owner,
                 type: type === PackedScene_Flags.TYPE_INSTANTIATED ? "_instantiated" : names[type],
@@ -98,10 +103,11 @@ export class PackedScene {
                 instance: get_node_instance(instance, parent),
                 groups: [],
                 properties: {},
-                children: []
+                children: [],
+                connections: []
             };
             if (parent) {
-                parent.children.push(node);
+                parent.children.push(this.nodes.length);
             }
             this.paths[node.path.join('/')] = node;
             const prop_count = nodes[idx++];
@@ -116,16 +122,38 @@ export class PackedScene {
             }
             this.nodes.push(node);
         }
+        idx = 0;
+        while (idx < conns.length) {
+            const from = conns[idx++];
+            const to = conns[idx++];
+            const signal = conns[idx++];
+            const method = conns[idx++];
+            const flags = conns[idx++];
+            const binds_length = conns[idx++];
+            const binds = [];
+            for (let i = 0; i < binds_length; i++) {
+                binds.push(conns[idx++]);
+            }
+            let unbinds = undefined;
+            ;
+            if (version >= 3) {
+                unbinds = conns[idx++];
+            }
+            this.connections.push({
+                from, to, signal: names[signal], method: names[method], flags, binds: binds.map(x => variants[x]), unbinds
+            });
+        }
     }
     findNode(nodePath) {
         let result = this.nodes[0];
         let remaining_path = [];
         for (const [idx, node] of nodePath.entries()) {
-            result = result?.children.find(x => x.name == node);
+            const result_idx = result?.children.find(x => this.nodes[x].name == node);
             remaining_path = nodePath.slice(idx + 1);
-            if (!result) {
+            if (result_idx === undefined) {
                 throw new Error(`Unable to lookup path [${nodePath.join('/')}]`);
             }
+            result = this.nodes[result_idx];
             if (result?.type == "_instantiated")
                 break;
         }

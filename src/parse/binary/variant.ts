@@ -140,6 +140,8 @@ export class Callable implements VariantType {
 }
 export class Signal implements VariantType {
 	type = "signal";
+	name?: String;
+	object_id?: Integer64;
 }
 export class Dictionary implements VariantType {
 	type = "dictionary";
@@ -148,6 +150,9 @@ export class Dictionary implements VariantType {
 export class Array implements VariantType {
 	type = "array";
 	value: VariantType[] = []
+	builtin_type?: Integer;
+	class_name?: String;
+	script?: String;
 }
 export class PackedByteArray implements VariantType {
 	type = "packed_byte_array";

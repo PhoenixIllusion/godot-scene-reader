@@ -1,6 +1,7 @@
 import { TokenType } from "../../parse/binary/gdc_tokens";
 import { ERR_FAIL_V_MSG } from "../../util/data-reader";
 import { get_rule, Precedence } from "./rules";
+import * as Variant from '../../parse/binary/variant';
 import { AnnotationInfo_TargetKind, AnnotationNode, ArrayNode, AssertNode, AssignmentNode, AssignmentOperation, AwaitNode, BinaryOpNode, BinaryOpType, BreakNode, BreakpointNode, CallNode, CastNode, ClassNode, ConstantNode, ContinueNode, DictionaryNode, DictionaryNode_Style, EnumNode, EnumValue, ForNode, FunctionNode, GetNodeNode, IdentifierNode, IdentifierNode_Source, IfNode, LambdaNode, LiteralNode, MatchBranchNode, MatchNode, ParameterNode, PassNode, PatternNode, PatternNode_Type, PreloadNode, registerAnnotations, ReturnNode, SelfNode, SignalNode, SubscriptNode, SuiteNode, SuiteNode_Local, SuiteNode_Local_Type, TernaryOpNode, Type, TypeNode, TypeTestNode, UnaryOpNode, UnaryOpNode_OpType, VariableNode, VariableNode_PropertyStyle, VariantOperator, WhileNode } from "./type";
 function canonicalize_path(path) {
     return path;
@@ -445,7 +446,7 @@ export class BinaryParser {
             if (literal.type_s != 'STRING') {
                 push_error(`(Only strings or identifiers can be used after "extends", found "${literal.type_s}" instead.)`);
             }
-            current_class.extends_path = literal.val;
+            current_class.extends_path = (literal.val).value;
             if (!this.match(TokenType.PERIOD)) {
                 return;
             }
@@ -1742,22 +1743,22 @@ export class BinaryParser {
     parse_builtin_constant(_p_previous_operand, _p_can_assign) {
         const op_type = this.previous.type;
         const constant = new LiteralNode();
-        const num_Constant = { type: 4, type_s: 'FLOAT', val: 0 };
+        const num_Constant = { type: 4, type_s: 'FLOAT', val: new Variant.Float(0) };
         switch (op_type) {
             case TokenType.CONST_PI:
-                num_Constant.val = Math.PI;
+                num_Constant.val = new Variant.Float(Math.PI);
                 constant.value = num_Constant;
                 break;
             case TokenType.CONST_TAU:
-                num_Constant.val = Math.PI * 2;
+                num_Constant.val = new Variant.Float(Math.PI * 2);
                 constant.value = num_Constant;
                 break;
             case TokenType.CONST_INF:
-                num_Constant.val = Number.POSITIVE_INFINITY;
+                num_Constant.val = new Variant.Float(Number.POSITIVE_INFINITY);
                 constant.value = num_Constant;
                 break;
             case TokenType.CONST_NAN:
-                num_Constant.val = Number.NaN;
+                num_Constant.val = new Variant.Float(Number.NaN);
                 constant.value = num_Constant;
                 break;
             default:
