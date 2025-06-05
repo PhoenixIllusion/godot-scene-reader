@@ -104,10 +104,12 @@ export class PackedScene {
         return { parent, path, is_path: null };
       }
       const nodePath = is_path.names.map(x => x.value);
-      let { node, remaining_path } = this.findNode(nodePath);
-      if(this.nodes[0].type == "_instantiated") { // root is extern, we can't look anything up
-        node = this.nodes[0];
-        remaining_path = nodePath;
+      let node: SceneNode | undefined  = this.nodes[0];
+      let remaining_path = nodePath;
+      if(this.nodes[0].type != "_instantiated") { // root is extern, we can't look anything up
+        const n = this.findNode(nodePath);
+        node = n.node;
+        remaining_path = n.remaining_path;
       }
       if (node == this.nodes[0] && remaining_path.length == 0)
         throw new Error(`Unable to lookup path [${is_path.names.map(x => x.value).join('/')}]`);
