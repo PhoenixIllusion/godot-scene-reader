@@ -1,6 +1,6 @@
 
 export const VERSION_MAJOR = 4;
-export const VERSION_MINOR = 4;
+export const VERSION_MINOR = 5;
 
 export const enum LogLevel {
   OFF,

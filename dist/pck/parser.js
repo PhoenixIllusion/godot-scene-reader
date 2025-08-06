@@ -1,6 +1,7 @@
 import { DataReader, decoder, ERR_FAIL_COND_V_MSG, VERSION_MAJOR, VERSION_MINOR } from "../util/data-reader";
 const PACK_HEADER_MAGIC = 0x43504447;
-const PACK_FORMAT_VERSION = 2;
+const PACK_FORMAT_VERSION_V2 = 2;
+const PACK_FORMAT_VERSION_V3 = 3;
 var PackFlags;
 (function (PackFlags) {
     PackFlags[PackFlags["PACK_DIR_ENCRYPTED"] = 1] = "PACK_DIR_ENCRYPTED";
@@ -65,20 +66,28 @@ export function try_open_pack(pck_path, pack, p_offset = 0) {
     const ver_major = f.get_32();
     const ver_minor = f.get_32();
     f.get_32();
-    ERR_FAIL_COND_V_MSG(version != PACK_FORMAT_VERSION, false, `Pack version unsupported: ${version}.`);
+    ERR_FAIL_COND_V_MSG(version != PACK_FORMAT_VERSION_V2 && version != PACK_FORMAT_VERSION_V3, false, `Pack version unsupported: ${version}.`);
     ERR_FAIL_COND_V_MSG(ver_major > VERSION_MAJOR || (ver_major == VERSION_MAJOR && ver_minor > VERSION_MINOR), false, `Pack created with a newer version of the engine: ${ver_major}.${ver_minor}.`);
     const pack_flags = f.get_32();
-    let file_base = f.get_64();
     const enc_directory = (pack_flags & PackFlags.PACK_DIR_ENCRYPTED);
-    const rel_filebase = (pack_flags & PackFlags.PACK_REL_FILEBASE);
-    for (let i = 0; i < 16; i++) {
-        //reserved
-        f.get_32();
-    }
-    const file_count = f.get_32();
-    if (rel_filebase) {
+    const rel_filebase = (pack_flags & PackFlags.PACK_REL_FILEBASE); // Note: Always enabled for V3.
+    let file_base = f.get_64();
+    if ((version == PACK_FORMAT_VERSION_V3) || (version == PACK_FORMAT_VERSION_V2 && rel_filebase)) {
         file_base += pck_start_pos;
     }
+    if (version == PACK_FORMAT_VERSION_V3) {
+        // V3: Read directory offset and skip reserved part of the header.
+        const dir_offset = f.get_64() + pck_start_pos;
+        f.seek(dir_offset);
+    }
+    else if (version == PACK_FORMAT_VERSION_V2) {
+        // V2: Directory directly after the header.
+        for (let i = 0; i < 16; i++) {
+            f.get_32(); // Reserved.
+        }
+    }
+    // Read directory.
+    const file_count = f.get_32();
     if (enc_directory) {
         throw new Error("Can't open encrypted pack directory.");
     }
@@ -96,7 +105,7 @@ export function try_open_pack(pck_path, pack, p_offset = 0) {
             }
         }
         else {
-            const entry = new PckEntry(pck_path, path, file_base + ofs + p_offset, size, md5, pack, false, !!(flags & PackFileFlags.PACK_FILE_ENCRYPTED));
+            const entry = new PckEntry(pck_path, path, file_base + ofs, size, md5, pack, false, !!(flags & PackFileFlags.PACK_FILE_ENCRYPTED));
             result[path] = entry;
         }
     }

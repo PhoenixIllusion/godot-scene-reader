@@ -60,22 +60,7 @@ function data_image(f, w, h, mipmaps, format) {
     }
     return mipmap_images;
 }
-export function try_open_ctex(arrayBuffer) {
-    let dataView = new DataView(arrayBuffer);
-    const header = decoder.decode(new Uint8Array(arrayBuffer.slice(0, 4)));
-    if (header !== 'GST2') {
-        throw new Error("Cannot Open File");
-    }
-    const f = new GodotReader(new DataReader(dataView, true), false);
-    f.skip(4);
-    const version = f.get_32();
-    const width = f.get_32();
-    const height = f.get_32();
-    const flags = f.get_32();
-    const mipmap_limit = f.get_32();
-    f.get_32();
-    f.get_32();
-    f.get_32(); //reserved 12 bytes
+function load_image_from_file(f) {
     const data_format = f.get_32();
     const w = f.get_16();
     const h = f.get_16();
@@ -95,12 +80,67 @@ export function try_open_ctex(arrayBuffer) {
     }
     else if (data_format == DataFormat.DATA_FORMAT_IMAGE) {
         images = data_image(f, w, h, mipmaps, format);
-        if (f.get_position() != arrayBuffer.byteLength) {
-            throw new Error("Assertion Failed in Parsing Image Format");
-        }
+    }
+    return { width: w, height: h, data_format, format, mipmaps, images };
+}
+export function try_open_ctex(arrayBuffer) {
+    let dataView = new DataView(arrayBuffer);
+    const header = decoder.decode(new Uint8Array(arrayBuffer.slice(0, 4)));
+    if (header !== 'GST2') {
+        throw new Error("Cannot Open File");
+    }
+    const f = new GodotReader(new DataReader(dataView, true), false);
+    f.skip(4);
+    const version = f.get_32();
+    const width = f.get_32();
+    const height = f.get_32();
+    const flags = f.get_32();
+    const mipmap_limit = f.get_32();
+    f.get_32();
+    f.get_32();
+    f.get_32(); //reserved 12 bytes
+    const images = load_image_from_file(f);
+    if (f.get_position() != arrayBuffer.byteLength) {
+        throw new Error("Assertion Failed in Parsing Image Format");
     }
     return {
         version, width, height, flags, mipmap_limit,
-        images
+        images: images.images
     };
+}
+var LayeredType;
+(function (LayeredType) {
+    LayeredType[LayeredType["LAYERED_TYPE_2D_ARRAY"] = 0] = "LAYERED_TYPE_2D_ARRAY";
+    LayeredType[LayeredType["LAYERED_TYPE_CUBEMAP"] = 1] = "LAYERED_TYPE_CUBEMAP";
+    LayeredType[LayeredType["LAYERED_TYPE_CUBEMAP_ARRAY"] = 2] = "LAYERED_TYPE_CUBEMAP_ARRAY";
+})(LayeredType || (LayeredType = {}));
+export function try_open_ctexarray(arrayBuffer) {
+    let dataView = new DataView(arrayBuffer);
+    const header = decoder.decode(new Uint8Array(arrayBuffer.slice(0, 4)));
+    if (header !== 'GSTL') {
+        throw new Error("Cannot Open File");
+    }
+    const f = new GodotReader(new DataReader(dataView, true), false);
+    f.skip(4);
+    const version = f.get_32();
+    const layer_count = f.get_32();
+    const type = f.get_32();
+    if (type != LayeredType.LAYERED_TYPE_2D_ARRAY) {
+        throw new Error('Invalid Data. CTexArray is not LAYERED_TYPE_2D_ARRAY, found ' + type);
+    }
+    f.get_32(); // df, data-format, used for p_size_limit, unused
+    const mipmap_limit = f.get_32();
+    f.get_32();
+    f.get_32();
+    f.get_32(); //reserved 12 bytes
+    const result = [];
+    const flags = 0;
+    for (let i = 0; i < layer_count; i++) {
+        const { width, height, images } = load_image_from_file(f);
+        result.push({
+            version, width, height, flags, mipmap_limit,
+            images: images
+        });
+    }
+    return result;
 }

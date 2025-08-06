@@ -379,7 +379,7 @@ export function _get_array_from_surface(p_format, p_vertex_data, p_attrib_data, 
                         }
                         else {
                             const w = arr;
-                            const ir = new Uint16Array(p_index_data);
+                            const ir = new Uint32Array(p_index_data);
                             for (let j = 0; j < p_index_len; j++) {
                                 const v = ir[j];
                                 w[j] = v;

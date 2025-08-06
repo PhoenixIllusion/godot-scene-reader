@@ -1,5 +1,5 @@
 export const VERSION_MAJOR = 4;
-export const VERSION_MINOR = 4;
+export const VERSION_MINOR = 5;
 export var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["OFF"] = 0] = "OFF";

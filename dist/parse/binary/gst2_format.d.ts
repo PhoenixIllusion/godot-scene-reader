@@ -46,6 +46,6 @@ export declare const enum DataFormat {
     DATA_FORMAT_WEBP = 2,
     DATA_FORMAT_BASIS_UNIVERSAL = 3
 }
-export declare function get_format_pixel_size(p_format: ImageFormat): 4 | 0 | 1 | 2 | 8 | 16 | 6 | 3 | 12;
+export declare function get_format_pixel_size(p_format: ImageFormat): 4 | 0 | 1 | 2 | 8 | 3 | 16 | 6 | 12;
 export declare function get_format_pixel_rshift(p_format: ImageFormat): 0 | 1 | 2;
 export declare function get_format_block_size(p_format: ImageFormat): 4 | 1 | 8;

@@ -16,3 +16,4 @@ export interface cTexFile {
     images: cTexEntry[];
 }
 export declare function try_open_ctex(arrayBuffer: ArrayBuffer): cTexFile;
+export declare function try_open_ctexarray(arrayBuffer: ArrayBuffer): cTexFile[];

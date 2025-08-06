@@ -1,5 +1,5 @@
 export declare const VERSION_MAJOR = 4;
-export declare const VERSION_MINOR = 4;
+export declare const VERSION_MINOR = 5;
 export declare const enum LogLevel {
     OFF = 0,
     ERROR = 1,
