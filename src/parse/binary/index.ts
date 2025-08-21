@@ -1,14 +1,14 @@
-export * from './ecfg';
+export * from './ecfg.js';
 
-export * from './gdc_tokens';
-export * from './gdc';
+export * from './gdc_tokens.js';
+export * from './gdc.js';
 
-export * from './gst2_format';
-export * from './gst2';
+export * from './gst2_format.js';
+export * from './gst2.js';
 
-export * from './resource';
+export * from './resource.js';
 
-export * from './unmarshaller';
+export * from './unmarshaller.js';
 
-export * from './variant_binary';
-export * from './variant';
+export * from './variant_binary.js';
+export * from './variant.js';

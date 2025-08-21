@@ -1,6 +1,6 @@
-import { DataReader, decoder } from "../../util/data-reader";
-import { DataFormat, get_format_block_size, get_format_pixel_rshift, get_format_pixel_size, ImageFormat } from "./gst2_format";
-import { GodotReader } from "./util/reader";
+import { DataReader, decoder } from "../../util/data-reader.js";
+import { DataFormat, get_format_block_size, get_format_pixel_rshift, get_format_pixel_size, ImageFormat } from "./gst2_format.js";
+import { GodotReader } from "./util/reader.js";
 
 function load_image(f: GodotReader, data_format: DataFormat, w: number, h: number, mipmaps: number, format: ImageFormat, p_size_limit: number) {
   let sw = w;

@@ -1,6 +1,6 @@
-import { AABB, Vector4 } from "../../../parse/binary/variant";
-import { PrimitiveType, ARRAY_FLAG_MASK } from "./mesh_types";
-import { _get_array_from_surface, FA } from "./mesh_get_arrays";
+import { AABB, Vector4 } from "../../../parse/binary/variant.js";
+import { PrimitiveType, ARRAY_FLAG_MASK } from "./mesh_types.js";
+import { _get_array_from_surface, FA } from "./mesh_get_arrays.js";
 
 export type ArrayData = (FA | Uint8Array[]);
 

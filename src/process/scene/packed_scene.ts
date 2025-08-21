@@ -1,6 +1,7 @@
-import { InternalResourceEntry } from "../../parse/binary/resource";
-import { assertType, unwrap_dictionary, unwrap_string } from "../../parse/binary/util/assert_unpack";
-import { Array, Dictionary, Integer, NodePath, PackedInt32Array, PackedStringArray, VariantType } from "../../parse/binary/variant";
+import { InternalResourceEntry } from "../../parse/binary/resource.js";
+import { assertType, unwrap_dictionary, unwrap_string } from "../../parse/binary/util/assert_unpack.js";
+import { Array, Dictionary, Integer, NodePath, PackedInt32Array, PackedStringArray, VariantType
+  } from "../../parse/binary/variant.js";
 
 export const enum PackedScene_NameMask {
   NO_PARENT_SAVED = 0x7FFFFFFF,

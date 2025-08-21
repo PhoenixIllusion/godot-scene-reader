@@ -1,4 +1,4 @@
-import { Basis, Transform3D, Vector3 } from "../../parse";
+import { Basis, Transform3D, Vector3 } from "../../parse/binary/variant.js";
 export declare function Vector3_dot(vector: Vector3, p_with: Vector3): number;
 export declare function Vector3_set(vector: Vector3, x: number, y: number, z: number): Vector3 & {
     x: number;

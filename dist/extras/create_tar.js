@@ -1,7 +1,7 @@
-import { try_open_pack } from '../pck/parser';
-import { process_pck_file } from '../process/pck';
+import { try_open_pack } from '../pck/parser.js';
+import { process_pck_file } from '../process/pck.js';
 import { createTar } from 'nanotar';
-import { dump_cyclic_to_link } from './dump';
+import { dump_cyclic_to_link } from './dump.js';
 export async function dump_pck_file(root, path, buffer) {
     // @ts-ignore
     const pack = await process_pck_file(try_open_pack(path, buffer));

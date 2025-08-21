@@ -1,4 +1,4 @@
-import { DataFormat, ImageFormat } from "./gst2_format";
+import { DataFormat, ImageFormat } from "./gst2_format.js";
 export interface cTexEntry {
     width: number;
     height: number;

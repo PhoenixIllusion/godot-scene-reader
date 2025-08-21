@@ -1,5 +1,5 @@
-import { Constant } from "../../parse/binary/gdc";
-import { VariantType } from "../../parse/binary/variant";
+import { Constant } from "../../parse/binary/gdc.js";
+import { VariantType } from "../../parse/binary/variant.js";
 
 export const enum PropertyUsageFlags {
   PROPERTY_USAGE_NONE = 0,

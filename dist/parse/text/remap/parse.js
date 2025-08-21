@@ -1,5 +1,5 @@
-import { decoder } from "../../../util/data-reader";
-import { parse_text_resource } from "../resource";
+import { decoder } from "../../../util/data-reader.js";
+import { parse as parse_text_resource } from "../resource/parser.js";
 export function parse_remap(value) {
     const str = (value instanceof ArrayBuffer) ? decoder.decode(value) : value;
     const blocks = parse_text_resource(str.replace(/\x00$/, ''));

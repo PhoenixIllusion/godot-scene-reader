@@ -1,7 +1,7 @@
-import { cTexFile } from "../parse/binary/gst2";
-import { InternalResourceEntry } from "../parse/binary/resource";
-import type { PckFile } from "../pck/parser";
-import { ClassNode } from "./gdc/type";
+import { cTexFile } from "../parse/binary/gst2.js";
+import { InternalResourceEntry } from "../parse/binary/resource.js";
+import type { PckFile } from "../pck/parser.js";
+import { ClassNode } from "./gdc/type.js";
 export interface PCK {
     project?: Record<string, any>;
     resources: Record<string, {

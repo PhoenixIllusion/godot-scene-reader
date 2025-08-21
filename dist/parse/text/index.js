@@ -1,2 +1,2 @@
-export * from './remap/index';
-export * from './resource/index';
+export * from './remap/index.js';
+export * from './resource/index.js';

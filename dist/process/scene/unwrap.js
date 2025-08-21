@@ -1,4 +1,4 @@
-import { assertType, unwrap_value } from "../../parse/binary/util/assert_unpack";
+import { assertType, unwrap_value } from "../../parse/binary/util/assert_unpack.js";
 export function unwrap_property_array(properties, field, keys) {
     const ret = [];
     let idx = 0;

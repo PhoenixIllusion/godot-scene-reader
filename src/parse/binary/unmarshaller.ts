@@ -1,6 +1,6 @@
-import { decoder } from "../../util/data-reader";
-import { GodotReader } from "./util/reader";
-import * as Variant from './variant';
+import { decoder } from "../../util/data-reader.js";
+import { GodotReader } from "./util/reader.js";
+import * as Variant from './variant.js';
 
 const HEADER_TYPE_MASK = 0xFF;
 const HEADER_DATA_FLAG_64 = (1 << 16)

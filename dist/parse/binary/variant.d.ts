@@ -1,5 +1,5 @@
-import { ExtResource, IntResource } from "./resource";
-import { GodotReader } from "./util/reader";
+import { ExtResource, IntResource } from "./resource.js";
+import { GodotReader } from "./util/reader.js";
 export interface VariantType {
     type: string;
 }

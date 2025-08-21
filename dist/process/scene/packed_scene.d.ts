@@ -1,5 +1,5 @@
-import { InternalResourceEntry } from "../../parse/binary/resource";
-import { NodePath, VariantType } from "../../parse/binary/variant";
+import { InternalResourceEntry } from "../../parse/binary/resource.js";
+import { NodePath, VariantType } from "../../parse/binary/variant.js";
 export declare const enum PackedScene_NameMask {
     NO_PARENT_SAVED = 2147483647,
     NAME_INDEX_BITS = 18,

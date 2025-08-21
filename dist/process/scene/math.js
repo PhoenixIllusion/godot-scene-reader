@@ -1,4 +1,4 @@
-import { Basis, Transform3D, Vector3 } from "../../parse";
+import { Basis, Transform3D, Vector3 } from "../../parse/binary/variant.js";
 export function Vector3_dot(vector, p_with) {
     const { x, y, z } = vector;
     return x * p_with.x + y * p_with.y + z * p_with.z;

@@ -1,5 +1,5 @@
-import { decoder, ERR_FAIL_COND_V_MSG, ERR_FAIL_V, WARN_PRINT } from "../../util/data-reader";
-import { BIN } from "./variant_binary";
+import { decoder, ERR_FAIL_COND_V_MSG, ERR_FAIL_V, WARN_PRINT } from "../../util/data-reader.js";
+import { BIN } from "./variant_binary.js";
 const cache_mode_for_external = 1;
 export class Nil {
     constructor() {

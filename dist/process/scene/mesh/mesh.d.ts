@@ -1,6 +1,6 @@
-import { AABB, Vector4 } from "../../../parse/binary/variant";
-import { PrimitiveType } from "./mesh_types";
-import { FA } from "./mesh_get_arrays";
+import { AABB, Vector4 } from "../../../parse/binary/variant.js";
+import { PrimitiveType } from "./mesh_types.js";
+import { FA } from "./mesh_get_arrays.js";
 export type ArrayData = (FA | Uint8Array[]);
 export interface SurfaceData<MaterialType> {
     primitive: PrimitiveType;

@@ -1,4 +1,4 @@
-import { AABB, Vector4 } from "../../../parse/binary/variant";
+import { AABB, Vector4 } from "../../../parse/binary/variant.js";
 type F1 = number;
 type F2 = [number, number];
 type F3 = [number, number, number];

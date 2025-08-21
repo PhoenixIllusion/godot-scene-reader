@@ -1,4 +1,4 @@
-import { DataReader, decoder, ERR_FAIL_COND_V_MSG, VERSION_MAJOR, VERSION_MINOR } from "../util/data-reader";
+import { DataReader, decoder, ERR_FAIL_COND_V_MSG, VERSION_MAJOR, VERSION_MINOR } from "../util/data-reader.js";
 
 const PACK_HEADER_MAGIC = 0x43504447;
 const PACK_FORMAT_VERSION_V2 = 2;

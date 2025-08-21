@@ -1,4 +1,4 @@
-import { decycle } from './cycle';
+import { decycle } from './cycle.js';
 function _arrayBufferToBase64(buffer) {
     var binary = '';
     var bytes = new Uint8Array(buffer);

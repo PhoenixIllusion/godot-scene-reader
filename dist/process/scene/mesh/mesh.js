@@ -1,6 +1,6 @@
-import { Vector4 } from "../../../parse/binary/variant";
-import { ARRAY_FLAG_MASK } from "./mesh_types";
-import { _get_array_from_surface } from "./mesh_get_arrays";
+import { Vector4 } from "../../../parse/binary/variant.js";
+import { ARRAY_FLAG_MASK } from "./mesh_types.js";
+import { _get_array_from_surface } from "./mesh_get_arrays.js";
 export class Surface {
     constructor(surface) {
         this.primitive = surface.primitive;

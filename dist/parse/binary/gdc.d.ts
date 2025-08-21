@@ -1,5 +1,5 @@
-import { TokenType } from "./gdc_tokens";
-import { decode_variant } from "./unmarshaller";
+import { TokenType } from "./gdc_tokens.js";
+import { decode_variant } from "./unmarshaller.js";
 export interface Token {
     type: TokenType;
     start_line: number;

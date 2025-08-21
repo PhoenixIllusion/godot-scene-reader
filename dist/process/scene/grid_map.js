@@ -1,5 +1,5 @@
-import { Basis, Vector3 } from "../../parse/binary/variant";
-import { Basis_scale, Vector3_set } from "./math";
+import { Basis, Vector3 } from "../../parse/binary/variant.js";
+import { Basis_scale, Vector3_set } from "./math.js";
 function MakeBasis(xx, xy, xz, yx, yy, yz, zx, zy, zz) {
     const basis = new Basis();
     basis.rows[0] = { type: 'vector3', x: xx, y: xy, z: xz };

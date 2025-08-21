@@ -1,11 +1,11 @@
-import { try_open_bin_config } from "../parse/binary/ecfg";
-import { try_open_gdc } from "../parse/binary/gdc";
-import { cTexFile, try_open_ctex } from "../parse/binary/gst2";
-import { InternalResourceEntry, try_open_bin_resource } from "../parse/binary/resource";
-import { parse_remap } from "../parse/text/remap/parse";
-import type { PckFile } from "../pck/parser"
-import { BinaryParser, Tokenizer } from "./gdc/parser";
-import { ClassNode } from "./gdc/type";
+import { try_open_bin_config } from "../parse/binary/ecfg.js";
+import { try_open_gdc } from "../parse/binary/gdc.js";
+import { cTexFile, try_open_ctex } from "../parse/binary/gst2.js";
+import { InternalResourceEntry, try_open_bin_resource } from "../parse/binary/resource.js";
+import { parse_remap } from "../parse/text/remap/parse.js";
+import type { PckFile } from "../pck/parser.js"
+import { BinaryParser, Tokenizer } from "./gdc/parser.js";
+import { ClassNode } from "./gdc/type.js";
 
 export interface PCK {
   project?: Record<string, any>;

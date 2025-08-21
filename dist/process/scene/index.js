@@ -1,2 +1,2 @@
-export * from './packed_scene';
-export * from './mesh';
+export * from './packed_scene.js';
+export * from './mesh/index.js';

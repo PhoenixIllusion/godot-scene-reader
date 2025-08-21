@@ -1,4 +1,4 @@
-import { decoder } from "../../util/data-reader";
+import { decoder } from "../../util/data-reader.js";
 
 import * as fzstd from 'fzstd';
 

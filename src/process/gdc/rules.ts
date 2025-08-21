@@ -1,6 +1,6 @@
-import { TokenType } from "../../parse/binary/gdc_tokens";
-import { BinaryParser } from "./parser";
-import { ExpressionNode } from "./type";
+import { TokenType } from "../../parse/binary/gdc_tokens.js";
+import { BinaryParser } from "./parser.js";
+import { ExpressionNode } from "./type.js";
 
 export const	enum Precedence {
 	PREC_NONE,

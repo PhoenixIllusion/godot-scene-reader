@@ -1,3 +1,3 @@
-export * from './pck';
-export * from './scene';
-export * from './gdc';
+export * from './pck.js';
+export * from './scene/index.js';
+export * from './gdc/index.js';

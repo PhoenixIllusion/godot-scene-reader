@@ -1,5 +1,5 @@
-import { Basis, Transform3D, Vector3 } from "../../parse/binary/variant";
-import { MeshLibrary, MeshLibraryItem } from "./mesh_library";
+import { Basis, Transform3D, Vector3 } from "../../parse/binary/variant.js";
+import { MeshLibrary, MeshLibraryItem } from "./mesh_library.js";
 export interface GridMap<MeshType, Shape3DType> {
     cell_center_x: boolean;
     cell_center_y: boolean;

@@ -1,5 +1,5 @@
-import { InternalResourceEntry } from "../../parse/binary/resource";
-import { Dictionary, VariantType } from "../../parse/binary/variant";
+import { InternalResourceEntry } from "../../parse/binary/resource.js";
+import { Dictionary, VariantType } from "../../parse/binary/variant.js";
 export type LinkRef = {
     type: 'ref';
     value: InternalResourceEntry;

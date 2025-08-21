@@ -1,9 +1,9 @@
-import { Constant, GdcFile, Token } from "../../parse/binary/gdc";
-import { TokenType } from "../../parse/binary/gdc_tokens";
-import { ERR_FAIL_V_MSG } from "../../util/data-reader";
-import { get_rule, Precedence } from "./rules";
-import * as Variant from '../../parse/binary/variant';
-import { AnnotationInfo_TargetKind, AnnotationNode, ArrayNode, AssertNode, AssignmentNode, AssignmentOperation, AwaitNode, BinaryOpNode, BinaryOpType, BreakNode, BreakpointNode, CallNode, CastNode, ClassMemberSource, ClassNode, ConstantNode, ContinueNode, DictionaryNode, DictionaryNode_Style, EnumNode, EnumValue, ExpressionNode, ForNode, FunctionNode, GetNodeNode, IdentifierNode, IdentifierNode_Source, IfNode, LambdaNode, LiteralNode, MatchBranchNode, MatchNode, Node, ParameterNode, PassNode, PatternNode, PatternNode_Type, PreloadNode, registerAnnotations, ReturnNode, SelfNode, SignalNode, SubscriptNode, SuiteNode, SuiteNode_Local, SuiteNode_Local_Type, TernaryOpNode, Type, TypeNode, TypeTestNode, UnaryOpNode, UnaryOpNode_OpType, VariableNode, VariableNode_PropertyStyle, VariantOperator, WhileNode } from "./type";
+import { Constant, GdcFile, Token } from "../../parse/binary/gdc.js";
+import { TokenType } from "../../parse/binary/gdc_tokens.js";
+import { ERR_FAIL_V_MSG } from "../../util/data-reader.js";
+import { get_rule, Precedence } from "./rules.js";
+import * as Variant from '../../parse/binary/variant.js';
+import { AnnotationInfo_TargetKind, AnnotationNode, ArrayNode, AssertNode, AssignmentNode, AssignmentOperation, AwaitNode, BinaryOpNode, BinaryOpType, BreakNode, BreakpointNode, CallNode, CastNode, ClassMemberSource, ClassNode, ConstantNode, ContinueNode, DictionaryNode, DictionaryNode_Style, EnumNode, EnumValue, ExpressionNode, ForNode, FunctionNode, GetNodeNode, IdentifierNode, IdentifierNode_Source, IfNode, LambdaNode, LiteralNode, MatchBranchNode, MatchNode, Node, ParameterNode, PassNode, PatternNode, PatternNode_Type, PreloadNode, registerAnnotations, ReturnNode, SelfNode, SignalNode, SubscriptNode, SuiteNode, SuiteNode_Local, SuiteNode_Local_Type, TernaryOpNode, Type, TypeNode, TypeTestNode, UnaryOpNode, UnaryOpNode_OpType, VariableNode, VariableNode_PropertyStyle, VariantOperator, WhileNode } from "./type.js";
 
 function canonicalize_path(path: string): string {
   return path;

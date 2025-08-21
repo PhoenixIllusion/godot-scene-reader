@@ -1,5 +1,5 @@
-import { ERR_FAIL_V, ERR_PRINT } from "../../../util/data-reader";
-import { ArrayCustomFormat, ArrayFormat, ArrayType } from "./mesh_types";
+import { ERR_FAIL_V, ERR_PRINT } from "../../../util/data-reader.js";
+import { ArrayCustomFormat, ArrayFormat, ArrayType } from "./mesh_types.js";
 const SIZE_OF_FLOAT = 4;
 const SIZE_OF_U16 = 2;
 export function mesh_surface_make_offsets_from_format(p_format, p_vertex_len, p_index_len, offsets) {

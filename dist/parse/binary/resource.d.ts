@@ -1,4 +1,4 @@
-import { VariantType } from "./variant";
+import { VariantType } from "./variant.js";
 export interface ExtResource {
     type: string;
     path: string;

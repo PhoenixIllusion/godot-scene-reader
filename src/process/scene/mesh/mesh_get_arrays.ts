@@ -1,7 +1,7 @@
-import { ERR_FAIL_V } from "../../../util/data-reader";
-import { AABB, Vector3, Vector4 } from "../../../parse/binary/variant";
-import { mesh_surface_make_offsets_from_format } from "./mesh_offset_util";
-import { ArrayCustomFormat, ArrayFormat, ArrayType } from "./mesh_types";
+import { ERR_FAIL_V } from "../../../util/data-reader.js";
+import { AABB, Vector3, Vector4 } from "../../../parse/binary/variant.js";
+import { mesh_surface_make_offsets_from_format } from "./mesh_offset_util.js";
+import { ArrayCustomFormat, ArrayFormat, ArrayType } from "./mesh_types.js";
 
 const CMP_EPSILON = 0.00001
 

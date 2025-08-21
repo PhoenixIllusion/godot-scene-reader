@@ -1,9 +1,9 @@
-import { try_open_bin_config } from "../parse/binary/ecfg";
-import { try_open_gdc } from "../parse/binary/gdc";
-import { try_open_ctex } from "../parse/binary/gst2";
-import { try_open_bin_resource } from "../parse/binary/resource";
-import { parse_remap } from "../parse/text/remap/parse";
-import { BinaryParser, Tokenizer } from "./gdc/parser";
+import { try_open_bin_config } from "../parse/binary/ecfg.js";
+import { try_open_gdc } from "../parse/binary/gdc.js";
+import { try_open_ctex } from "../parse/binary/gst2.js";
+import { try_open_bin_resource } from "../parse/binary/resource.js";
+import { parse_remap } from "../parse/text/remap/parse.js";
+import { BinaryParser, Tokenizer } from "./gdc/parser.js";
 export async function process_pck_file(pack) {
     const result = { resources: {}, ctex: {}, remap: {}, gdc: {} };
     const keys = Object.keys(pack);

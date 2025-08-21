@@ -1,4 +1,4 @@
-import { DataReader } from "../../../util/data-reader";
+import { DataReader } from "../../../util/data-reader.js";
 
 export class GodotReader {
   constructor(public reader: DataReader, public use_real64: boolean) { }

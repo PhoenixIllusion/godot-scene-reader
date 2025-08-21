@@ -1,4 +1,4 @@
-import { VariantMarshaller } from "./unmarshaller";
+import { VariantMarshaller } from "./unmarshaller.js";
 
 export function unmarshaller_type_as_string(type: VariantMarshaller): string {
   switch (type) {

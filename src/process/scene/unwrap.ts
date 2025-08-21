@@ -1,6 +1,6 @@
-import { InternalResourceEntry } from "../../parse/binary/resource";
-import { assertType, unwrap_value } from "../../parse/binary/util/assert_unpack";
-import { Dictionary, Array as ArrayT, VariantType, NodePath } from "../../parse/binary/variant";
+import { InternalResourceEntry } from "../../parse/binary/resource.js";
+import { assertType, unwrap_value } from "../../parse/binary/util/assert_unpack.js";
+import { Dictionary, Array as ArrayT, VariantType, NodePath } from "../../parse/binary/variant.js";
 
 export type LinkRef = { type: 'ref', value: InternalResourceEntry };
 

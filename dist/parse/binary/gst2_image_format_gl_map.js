@@ -1,5 +1,5 @@
-import { ERR_FAIL_V_MSG } from "../../util/data-reader";
-import { ImageFormat } from "./gst2_format";
+import { ERR_FAIL_V_MSG } from "../../util/data-reader.js";
+import { ImageFormat } from "./gst2_format.js";
 const RED = 0x1903;
 const RGB8 = 0x8051;
 const RGBA4 = 0x8056;

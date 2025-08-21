@@ -1,5 +1,5 @@
-import { GodotReader } from "./util/reader";
-import * as Variant from './variant';
+import { GodotReader } from "./util/reader.js";
+import * as Variant from './variant.js';
 export declare const enum VariantMarshaller {
     NIL = 0,
     BOOL = 1,

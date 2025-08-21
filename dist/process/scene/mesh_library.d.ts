@@ -1,5 +1,5 @@
-import { cTexFile } from "../../parse/binary/gst2";
-import { Nil, Transform3D } from "../../parse/binary/variant";
+import { cTexFile } from "../../parse/binary/gst2.js";
+import { Nil, Transform3D } from "../../parse/binary/variant.js";
 export type MeshLibrary<MeshType, Shape3DType> = {
     [key: `item/${number}/mesh`]: MeshType;
     [key: `item/${number}/mesh_transform`]: Transform3D;

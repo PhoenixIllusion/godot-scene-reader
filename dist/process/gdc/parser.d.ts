@@ -1,7 +1,7 @@
-import { GdcFile, Token } from "../../parse/binary/gdc";
-import { TokenType } from "../../parse/binary/gdc_tokens";
-import { Precedence } from "./rules";
-import { AnnotationInfo_TargetKind, AnnotationNode, AssertNode, BreakNode, ClassMemberSource, ClassNode, ConstantNode, ContinueNode, EnumNode, EnumValue, ExpressionNode, ForNode, FunctionNode, IdentifierNode, IfNode, LambdaNode, MatchBranchNode, MatchNode, Node, ParameterNode, PatternNode, SignalNode, SuiteNode, TypeNode, VariableNode, WhileNode } from "./type";
+import { GdcFile, Token } from "../../parse/binary/gdc.js";
+import { TokenType } from "../../parse/binary/gdc_tokens.js";
+import { Precedence } from "./rules.js";
+import { AnnotationInfo_TargetKind, AnnotationNode, AssertNode, BreakNode, ClassMemberSource, ClassNode, ConstantNode, ContinueNode, EnumNode, EnumValue, ExpressionNode, ForNode, FunctionNode, IdentifierNode, IfNode, LambdaNode, MatchBranchNode, MatchNode, Node, ParameterNode, PatternNode, SignalNode, SuiteNode, TypeNode, VariableNode, WhileNode } from "./type.js";
 export declare class Tokenizer {
     current: number;
     current_line: number;

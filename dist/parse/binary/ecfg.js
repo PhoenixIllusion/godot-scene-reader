@@ -1,6 +1,6 @@
-import { DataReader, decoder } from "../../util/data-reader";
-import { decode_variant } from "./unmarshaller";
-import { GodotReader } from "./util/reader";
+import { DataReader, decoder } from "../../util/data-reader.js";
+import { decode_variant } from "./unmarshaller.js";
+import { GodotReader } from "./util/reader.js";
 export function try_open_bin_config(arrayBuffer) {
     const header = decoder.decode(arrayBuffer.slice(0, 4));
     if (header !== 'ECFG') {

@@ -1,4 +1,4 @@
-import { assertType, unwrap_dictionary, unwrap_string } from "../../parse/binary/util/assert_unpack";
+import { assertType, unwrap_dictionary, unwrap_string } from "../../parse/binary/util/assert_unpack.js";
 export var PackedScene_NameMask;
 (function (PackedScene_NameMask) {
     PackedScene_NameMask[PackedScene_NameMask["NO_PARENT_SAVED"] = 2147483647] = "NO_PARENT_SAVED";

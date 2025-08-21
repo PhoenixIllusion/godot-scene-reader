@@ -1,6 +1,6 @@
-import { cTexFile } from "../../parse/binary/gst2";
-import { Nil, Transform3D } from "../../parse/binary/variant";
-import { unwrap_property_array } from "./unwrap";
+import { cTexFile } from "../../parse/binary/gst2.js";
+import { Nil, Transform3D } from "../../parse/binary/variant.js";
+import { unwrap_property_array } from "./unwrap.js";
 
 
 export type MeshLibrary<MeshType,Shape3DType> = {

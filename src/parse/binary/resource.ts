@@ -1,7 +1,7 @@
-import { DataReader, decoder, ERR_FAIL_V_MSG, VERSION_MAJOR, VERSION_MINOR, WARN_PRINT } from "../../util/data-reader";
-import { decompress_buffer } from "./resource_decompress";
-import { GodotReader } from "./util/reader";
-import { parse_variant, ResourceData, VariantType } from "./variant";
+import { DataReader, decoder, ERR_FAIL_V_MSG, VERSION_MAJOR, VERSION_MINOR, WARN_PRINT } from "../../util/data-reader.js";
+import { decompress_buffer } from "./resource_decompress.js";
+import { GodotReader } from "./util/reader.js";
+import { parse_variant, ResourceData, VariantType } from "./variant.js";
 
 const FORMAT_VERSION = 6;
 

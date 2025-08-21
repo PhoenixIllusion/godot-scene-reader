@@ -1,8 +1,8 @@
-import { DataReader, decoder } from "../../util/data-reader";
-import { TokenType } from "./gdc_tokens";
-import { decode_variant } from "./unmarshaller";
-import { unmarshaller_type_as_string } from "./unmarshaller_type";
-import { GodotReader } from "./util/reader";
+import { DataReader, decoder } from "../../util/data-reader.js";
+import { TokenType } from "./gdc_tokens.js";
+import { decode_variant } from "./unmarshaller.js";
+import { unmarshaller_type_as_string } from "./unmarshaller_type.js";
+import { GodotReader } from "./util/reader.js";
 import * as fzstd from 'fzstd';
 var TOKEN;
 (function (TOKEN) {

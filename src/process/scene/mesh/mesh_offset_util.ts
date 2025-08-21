@@ -1,5 +1,5 @@
-import { ERR_FAIL_V, ERR_PRINT } from "../../../util/data-reader";
-import { ArrayCustomFormat, ArrayFormat, ArrayType } from "./mesh_types";
+import { ERR_FAIL_V, ERR_PRINT } from "../../../util/data-reader.js";
+import { ArrayCustomFormat, ArrayFormat, ArrayType } from "./mesh_types.js";
 
 export interface VertexSizeAccumulator {
 	vertex_element_size: number,

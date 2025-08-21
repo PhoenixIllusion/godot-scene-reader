@@ -1,4 +1,4 @@
-import { ImageFormat } from "./gst2_format";
+import { ImageFormat } from "./gst2_format.js";
 interface GL_Image_Data_Type {
     internal_format: number;
     format: number;

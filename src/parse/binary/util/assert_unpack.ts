@@ -1,4 +1,4 @@
-import { Array, Dictionary, String, StringName, VariantType } from "../variant";
+import { Array, Dictionary, String, StringName, VariantType } from "../variant.js";
 
 export function unwrap_string(variant: VariantType): string {
   if (!(variant.type == 'string' || variant.type == 'stringname')) {
